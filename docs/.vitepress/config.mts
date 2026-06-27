@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: '/608ACM/',
   lang: 'zh-CN',
   title: '608ACM',
   description: '608 算法集训队 · 算法竞赛入门指北与下半年比赛说明',
