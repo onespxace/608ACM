@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "608ACM"
   text: "郑州工商学院 · 软件设计创新工作室"
-  tagline: "算法集训队 —— 关注工作室谢谢喵"
+  tagline: '<span class="studio-highlight">算法小猪</span> <span class="studio-gray studio-sub">猪和组谐音，令人忍俊不禁</span><br><span class="studio-gray">关注工作室谢谢喵</span>'
   image:
     src: /icpc.png
     alt: ICPC

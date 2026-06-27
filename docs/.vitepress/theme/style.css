@@ -125,10 +125,42 @@
 }
 
 .VPHome .VPHero .tagline {
-  font-size: 1.35rem !important;
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
   padding-top: 16px;
-  opacity: 0.8;
+  line-height: 1.6 !important;
 }
+
+.VPHome .VPHero .tagline .studio-highlight {
+  font-size: 2rem !important;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.VPHome .VPHero .tagline .studio-gray {
+  color: var(--vp-c-text-2);
+  -webkit-text-fill-color: var(--vp-c-text-2);
+}
+
+.VPHome .VPHero .tagline .studio-sub {
+  font-size: 0.9rem !important;
+}
+
+/* 入门指北按钮同配色 */
+.VPHome .VPHero .actions .action:first-child .VPButton.brand {
+  background: linear-gradient(135deg, #4facfe, #00f2fe) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+.VPHome .VPHero .actions .action:first-child .VPButton.brand:hover {
+  background: linear-gradient(135deg, #3d9ef0, #00ddf0) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
+
 
 .VPHome .VPHero .image-container img {
   max-height: 340px;
