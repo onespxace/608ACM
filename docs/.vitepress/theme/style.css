@@ -113,27 +113,27 @@
 }
 
 .VPHome .VPHero .name {
-  font-size: 3.2rem !important;
+  font-size: 4.2rem !important;
   line-height: 1.2 !important;
   letter-spacing: -0.02em;
 }
 
 .VPHome .VPHero .text {
-  font-size: 1.4rem !important;
+  font-size: 1.8rem !important;
   line-height: 1.5 !important;
-  padding-top: 8px;
+  padding-top: 12px;
 }
 
 .VPHome .VPHero .tagline {
-  font-size: 1.15rem !important;
-  padding-top: 12px;
+  font-size: 1.35rem !important;
+  padding-top: 16px;
   opacity: 0.8;
 }
 
 .VPHome .VPHero .image-container img {
-  max-height: 260px;
+  max-height: 340px;
   width: auto;
-  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.18));
+  filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.2));
   transition: transform 0.4s ease;
 }
 
