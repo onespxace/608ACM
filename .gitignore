@@ -1,4 +1,5 @@
 node_modules
+.history/
 docs/.vitepress/dist
 docs/.vitepress/cache
 docs/.vitepress/deps
@@ -7,3 +8,7 @@ docs/.vitepress/deps
 .playwright-mcp
 homepage-*.png
 sidebar-unified.png
+
+# Cloudflare Workers
+.wrangler/
+
