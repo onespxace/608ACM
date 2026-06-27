@@ -26,6 +26,14 @@ export default defineConfig({
         ]
       },
       {
+        text: '软件设计创新工作室',
+        items: [
+          { text: '工作室简介', link: '/studio/' },
+          { text: '算法组简介', link: '/studio/algorithm-team' },
+          { text: '加入我们', link: '/studio/join-us' }
+        ]
+      },
+      {
         text: '下半年比赛',
         items: [
           { text: 'ICPC', link: '/contests/icpc' },
@@ -47,6 +55,14 @@ export default defineConfig({
           ]
         },
         {
+          text: '软件设计创新工作室',
+          items: [
+            { text: '工作室简介', link: '/studio/' },
+            { text: '算法组简介', link: '/studio/algorithm-team' },
+            { text: '加入我们', link: '/studio/join-us' }
+          ]
+        },
+        {
           text: '下半年比赛说明',
           items: [
             { text: 'ICPC', link: '/contests/icpc' },
@@ -63,6 +79,41 @@ export default defineConfig({
           items: [
             { text: '算法竞赛入门指北', link: '/guide/' },
             { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' }
+          ]
+        },
+        {
+          text: '软件设计创新工作室',
+          items: [
+            { text: '工作室简介', link: '/studio/' },
+            { text: '算法组简介', link: '/studio/algorithm-team' },
+            { text: '加入我们', link: '/studio/join-us' }
+          ]
+        },
+        {
+          text: '下半年比赛说明',
+          items: [
+            { text: 'ICPC', link: '/contests/icpc' },
+            { text: 'CCPC', link: '/contests/ccpc' },
+            { text: '牛客多校', link: '/contests/nowcoder' },
+            { text: '常用网站导航', link: '/contests/acm-websites' },
+            { text: '常用资源', link: '/contests/resources' }
+          ]
+        }
+      ],
+      '/studio/': [
+        {
+          text: '入门指北',
+          items: [
+            { text: '算法竞赛入门指北', link: '/guide/' },
+            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' }
+          ]
+        },
+        {
+          text: '软件设计创新工作室',
+          items: [
+            { text: '工作室简介', link: '/studio/' },
+            { text: '算法组简介', link: '/studio/algorithm-team' },
+            { text: '加入我们', link: '/studio/join-us' }
           ]
         },
         {
