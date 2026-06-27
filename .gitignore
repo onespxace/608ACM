@@ -7,3 +7,10 @@ docs/.vitepress/deps
 .playwright-mcp
 homepage-*.png
 sidebar-unified.png
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
