@@ -1,0 +1,9 @@
+node_modules
+docs/.vitepress/dist
+docs/.vitepress/cache
+docs/.vitepress/deps
+*.log
+.DS_Store
+.playwright-mcp
+homepage-*.png
+sidebar-unified.png

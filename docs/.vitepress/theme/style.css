@@ -1,0 +1,220 @@
+/**
+ * 608ACM 全局样式 —— 排版优雅化
+ */
+
+/* 正文：字号、行高、段落间距，提升中文阅读舒适度 */
+.vp-doc {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.vp-doc p {
+  margin: 16px 0;
+}
+
+.vp-doc :not(pre) > code {
+  font-size: 0.875em;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-weight: 600;
+}
+
+/* 标题层级更清晰 */
+.vp-doc h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.vp-doc h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-top: 1px solid var(--vp-c-divider);
+  padding-top: 24px;
+  margin-top: 48px;
+}
+
+.vp-doc h3 {
+  font-size: 1.2rem;
+  font-weight: 650;
+}
+
+/* 代码块：圆角 + 更柔和的背景 */
+.vp-doc div[class*='language-'] {
+  border-radius: 10px;
+  margin: 16px 0;
+}
+
+.vp-doc div[class*='language-'] pre {
+  border-radius: 10px;
+}
+
+/* 表格：斑马纹 + 圆角 */
+.vp-doc table {
+  display: table;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 16px 0;
+}
+
+.vp-doc table tbody tr:nth-child(odd) {
+  background-color: var(--vp-c-bg-soft);
+}
+
+.vp-doc table th {
+  font-weight: 650;
+}
+
+/* 引用块更精致 */
+.vp-doc blockquote {
+  border-radius: 0 8px 8px 0;
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* 链接 hover 颜色统一 */
+.vp-doc a {
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.vp-doc a:hover {
+  text-decoration: underline;
+}
+
+/* 图片：圆角 + 居中阴影 */
+.vp-doc img {
+  border-radius: 10px;
+}
+
+.main img {
+  box-shadow: var(--vp-shadow-2);
+}
+
+/* ===== 主页 hero ===== */
+.VPHome .VPHero {
+  padding-bottom: 48px !important;
+}
+
+.VPHome .VPHero .container {
+  position: relative;
+}
+
+.VPHome .VPHero .main {
+  z-index: 1;
+}
+
+.VPHome .VPHero .name,
+.VPHome .VPHero .text {
+  max-width: 100% !important;
+}
+
+.VPHome .VPHero .name {
+  font-size: 3.2rem !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em;
+}
+
+.VPHome .VPHero .text {
+  font-size: 1.4rem !important;
+  line-height: 1.5 !important;
+  padding-top: 8px;
+}
+
+.VPHome .VPHero .tagline {
+  font-size: 1.15rem !important;
+  padding-top: 12px;
+  opacity: 0.8;
+}
+
+.VPHome .VPHero .image-container img {
+  max-height: 260px;
+  width: auto;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.18));
+  transition: transform 0.4s ease;
+}
+
+/* 去掉 hero 图标 hover 动效（用户要求图标不动） */
+
+/* Hero 背景渐变光晕 */
+.VPHome .VPHero::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(ellipse at 30% 50%, var(--vp-c-brand-soft) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 主页 feature 卡片：更精致的 hover 动效 */
+.VPFeatures {
+  padding-top: 24px !important;
+}
+
+.VPFeatures .container {
+  position: relative;
+  z-index: 1;
+}
+
+.VPFeatures .item {
+  border-radius: 14px;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+  border: 1px solid transparent;
+}
+
+.VPFeatures .item:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: var(--vp-c-brand-soft);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(58, 142, 230, 0.06);
+}
+
+.VPFeatures .VPLink:hover .title {
+  color: var(--vp-c-brand-1);
+}
+
+/* Feature 卡片 icon 放大 */
+.VPFeatures .icon {
+  font-size: 1.8rem !important;
+  transition: transform 0.28s ease;
+}
+
+.VPFeatures .item:hover .icon {
+  transform: scale(1.15);
+}
+
+/* Feature 卡片标题 */
+.VPFeatures .title {
+  font-size: 1.1rem !important;
+  font-weight: 650 !important;
+  transition: color 0.2s ease;
+}
+
+/* Feature 卡片描述 */
+.VPFeatures .details {
+  font-size: 0.92rem !important;
+  line-height: 1.65 !important;
+  opacity: 0.82;
+}
+
+/* 颜色微调：品牌色更沉稳的蓝绿 */
+:root {
+  --vp-c-brand-1: #3a8ee6;
+  --vp-c-brand-2: #2d7dd2;
+  --vp-c-brand-3: #1f6bb8;
+  --vp-c-brand-soft: rgba(58, 142, 230, 0.14);
+}
+
+/* 深色模式微调 */
+.dark .VPFeatures .item:hover {
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(58, 142, 230, 0.12);
+}
+
+.dark .VPHome .VPHero::before {
+  background: radial-gradient(ellipse at 30% 50%, rgba(58, 142, 230, 0.1) 0%, transparent 60%);
+}
