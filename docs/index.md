@@ -9,7 +9,7 @@ layout: home
 
 hero:
   name: '608ACM<span class="hm-caret" aria-hidden="true"></span>'
-  text: '郑州工商学院 · 软件设计创新工作室'
+  text: '软件设计创新工作室 · 算法组'
   tagline: '从第一行 C++ 到 XCPC 领奖台：入门指北、赛事解读、训练资源，还有一路同行的队友。'
   actions:
     - theme: brand
