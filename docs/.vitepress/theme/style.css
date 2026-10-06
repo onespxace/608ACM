@@ -1,252 +1,1883 @@
 /**
- * 608ACM 全局样式 —— 排版优雅化
+ * 608ACM 主题样式 v2 ——「判题机」
+ * ==================================================================
+ * 设计概念：整页借用 OJ / IDE 的视觉语言 —— 纸张底 + 墨色排版 + Accepted 绿，
+ * 右侧一块模拟评测面板（编辑器 + 终端）作为视觉锚点。
+ *
+ * 阅读地图：
+ *   §1  设计令牌      —— 所有颜色/间距的唯一出处
+ *   §2  VitePress 变量桥接
+ *   §3  Hero 外壳     —— 浅色纸张 + 点阵网格
+ *   §4  Hero 文案区   —— 状态胶囊 / 标题 / 按钮 / 快捷路径
+ *   §5  评测机面板    —— 编辑器 + 终端（两种模式都保持深色）
+ *   §6  分区骨架与标题
+ *   §7  数据带
+ *   §8  板块地图（bento）
+ *   §9  进阶阶梯
+ *   §10 终端式 CTA
+ *   §11 文档正文排版（内容页，与首页解耦）
+ *   §12 动效 / §13 响应式 / §14 降级 / §15 收尾
+ *
+ * 两条硬约束（从上一版继承的教训）：
+ *   1. 不做 scroll-driven reveal：view() 时间线在整页截图/未滚动场景会让内容
+ *      停在 opacity:0。所有动效只发生在首屏入场与悬停，且必须可降级。
+ *   2. Hero 背景色 = 页面底色（--vp-c-bg），浅色模式下两者相同，
+ *      不存在上一版暗色 Hero 与浅色正文之间的 1px 接缝问题。
  */
 
-/* 正文：字号、行高、段落间距，提升中文阅读舒适度 */
+/* ============================================================
+   §1 设计令牌
+   ============================================================ */
+:root {
+  /* 语义色：Accepted 绿 = 品牌签名色；四档难度色借鉴 CF rating 配色 */
+  --hm-green: #0a854a;
+  --hm-green-soft: rgba(10, 133, 74, 0.12);
+  --hm-rank-1: #64748b;
+  --hm-rank-1-soft: rgba(100, 116, 139, 0.12);
+  --hm-rank-2: #0e7490;
+  --hm-rank-2-soft: rgba(14, 116, 144, 0.12);
+  --hm-rank-3: #1d4ed8;
+  --hm-rank-3-soft: rgba(29, 78, 216, 0.12);
+  --hm-rank-4: #c02626;
+  --hm-rank-4-soft: rgba(192, 38, 38, 0.12);
+
+  /* 墨色体系（跟随明暗模式） */
+  --hm-ink: #0b1220;
+  --hm-ink-2: #566072;
+  --hm-ink-3: rgba(15, 23, 42, 0.5);
+  --hm-line: rgba(15, 23, 42, 0.1);
+  --hm-line-strong: rgba(15, 23, 42, 0.24);
+  --hm-tint: rgba(15, 23, 42, 0.028);
+  --hm-tint-hover: rgba(15, 23, 42, 0.05);
+  --hm-chip-bg: rgba(255, 255, 255, 0.92);
+  --hm-dot: rgba(15, 23, 42, 0.12);
+  --hm-wash-1: rgba(10, 143, 79, 0.09);
+  --hm-wash-2: rgba(37, 99, 235, 0.075);
+  --hm-glow-a: rgba(10, 143, 79, 0.2);
+  --hm-glow-b: rgba(37, 99, 235, 0.16);
+  --hm-card-hover-shadow: 0 22px 44px -28px rgba(11, 18, 32, 0.38);
+  --hm-btn-bg: #0b1220;
+  --hm-btn-fg: #ffffff;
+  --hm-btn-shadow: rgba(11, 18, 32, 0.5);
+
+  /* 内容页：行内代码与自定义块（tip / warning / …） */
+  --hm-accent-2: #0d9488;
+  --hm-grad-link: linear-gradient(90deg, #0a854a, #0d9488);
+  --hm-code-ink: #0a6e40;
+  --hm-code-bg: rgba(10, 133, 74, 0.08);
+  --hm-cb-tip: #0a854a;
+  --hm-cb-tip-bg: rgba(10, 133, 74, 0.07);
+  --hm-cb-tip-line: rgba(10, 133, 74, 0.3);
+  --hm-cb-warn: #b45309;
+  --hm-cb-warn-bg: rgba(245, 158, 11, 0.1);
+  --hm-cb-warn-line: rgba(217, 119, 6, 0.38);
+  --hm-cb-info: #1d4ed8;
+  --hm-cb-info-bg: rgba(37, 99, 235, 0.06);
+  --hm-cb-info-line: rgba(37, 99, 235, 0.3);
+  --hm-cb-danger: #b91c1c;
+  --hm-cb-danger-bg: rgba(220, 38, 38, 0.06);
+  --hm-cb-danger-line: rgba(220, 38, 38, 0.32);
+
+  /* 评测机面板：两种模式共用同一套深色，不做反色 */
+  --hm-panel-bg: #0b0f16;
+  --hm-panel-bar: #12161f;
+  --hm-panel-line: rgba(255, 255, 255, 0.08);
+  --hm-panel-shadow: 0 36px 70px -36px rgba(3, 8, 20, 0.55), 0 2px 10px rgba(3, 8, 20, 0.14);
+  --hm-panel-status-bg: rgba(16, 163, 90, 0.13);
+  --hm-panel-status-line: rgba(34, 197, 94, 0.26);
+  --hm-panel-green: #3ddc84;
+  --hm-panel-ink: #c9d1d9;
+  --hm-panel-ink-2: #8b949e;
+
+  /* 排版、尺寸与缓动 */
+  --hm-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+  --hm-radius: 16px;
+  --hm-radius-lg: 20px;
+  --hm-gutter: 24px;
+  --hm-max: 1152px;
+  --hm-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --hm-ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark {
+  --hm-green: #3ddc84;
+  --hm-green-soft: rgba(61, 220, 132, 0.14);
+  --hm-rank-1: #94a3b8;
+  --hm-rank-1-soft: rgba(148, 163, 184, 0.14);
+  --hm-rank-2: #22d3ee;
+  --hm-rank-2-soft: rgba(34, 211, 238, 0.13);
+  --hm-rank-3: #60a5fa;
+  --hm-rank-3-soft: rgba(96, 165, 250, 0.14);
+  --hm-rank-4: #f87171;
+  --hm-rank-4-soft: rgba(248, 113, 113, 0.14);
+
+  --hm-ink: #eef3fa;
+  --hm-ink-2: #9aa6ba;
+  --hm-ink-3: rgba(255, 255, 255, 0.5);
+  --hm-line: rgba(255, 255, 255, 0.1);
+  --hm-line-strong: rgba(255, 255, 255, 0.26);
+  --hm-tint: rgba(255, 255, 255, 0.035);
+  --hm-tint-hover: rgba(255, 255, 255, 0.06);
+  --hm-chip-bg: rgba(255, 255, 255, 0.05);
+  --hm-dot: rgba(255, 255, 255, 0.09);
+  --hm-wash-1: rgba(16, 185, 105, 0.12);
+  --hm-wash-2: rgba(59, 130, 246, 0.12);
+  --hm-glow-a: rgba(16, 185, 105, 0.22);
+  --hm-glow-b: rgba(59, 130, 246, 0.2);
+  --hm-card-hover-shadow: 0 22px 44px -30px rgba(0, 0, 0, 0.85);
+  --hm-btn-bg: #f2f6ff;
+  --hm-btn-fg: #0b1220;
+  --hm-btn-shadow: rgba(0, 0, 0, 0.8);
+
+  --hm-code-ink: #7ee2a8;
+  --hm-code-bg: rgba(61, 220, 132, 0.12);
+  --hm-accent-2: #2dd4bf;
+  --hm-grad-link: linear-gradient(90deg, #3ddc84, #2dd4bf);
+  --hm-cb-tip: #4ade80;
+  --hm-cb-tip-bg: rgba(61, 220, 132, 0.09);
+  --hm-cb-tip-line: rgba(61, 220, 132, 0.32);
+  --hm-cb-warn: #fbbf24;
+  --hm-cb-warn-bg: rgba(251, 191, 36, 0.1);
+  --hm-cb-warn-line: rgba(251, 191, 36, 0.34);
+  --hm-cb-info: #93c5fd;
+  --hm-cb-info-bg: rgba(96, 165, 250, 0.1);
+  --hm-cb-info-line: rgba(96, 165, 250, 0.32);
+  --hm-cb-danger: #fca5a5;
+  --hm-cb-danger-bg: rgba(248, 113, 113, 0.1);
+  --hm-cb-danger-line: rgba(248, 113, 113, 0.32);
+  --hm-panel-shadow: 0 36px 80px -40px rgba(0, 0, 0, 0.85), 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================
+   §2 VitePress 变量桥接
+   —— 品牌色统一为「Accepted 绿」：侧边栏激活态、右侧目录滑块、
+      翻页器悬停、链接等全部由 VitePress 自身的 var() 驱动，
+      改这里即可全站生效，避免与 scoped 样式做权重缠斗。
+      深色模式的 brand-3（按钮底色 + 白字）选了 #0d7a43：对比度 5.42:1。
+   ============================================================ */
+:root {
+  --vp-c-brand-1: #0a854a;
+  --vp-c-brand-2: #087040;
+  --vp-c-brand-3: #065f37;
+  --vp-c-brand-soft: rgba(10, 133, 74, 0.12);
+
+  /* Hero 标题走墨色，不再用渐变色字 */
+  --vp-home-hero-name-color: #0b1220;
+  --vp-home-hero-name-background: none;
+}
+
+.dark {
+  --vp-c-brand-1: #3ddc84;
+  --vp-c-brand-2: #6ee7a8;
+  --vp-c-brand-3: #0d7a43;
+  --vp-c-brand-soft: rgba(61, 220, 132, 0.16);
+  --vp-home-hero-name-color: #eef3fa;
+}
+
+/* ============================================================
+   §3 Hero 外壳：浅色纸张 + 点阵网格
+   ============================================================ */
+.VPHome .VPHero.VPHomeHero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: calc(var(--vp-nav-height) * -1);
+  padding: calc(var(--vp-nav-height) + 84px) var(--hm-gutter) 92px;
+  background-color: var(--vp-c-bg);
+  /* 两团极浅的色雾（绿 + 蓝），只存在于首屏顶部两角 */
+  background-image:
+    radial-gradient(880px 460px at 92% -8%, var(--hm-wash-1), transparent 64%),
+    radial-gradient(960px 500px at 4% 0%, var(--hm-wash-2), transparent 62%);
+}
+
+/* 点阵网格：技术图纸质感，向上下两侧自然淡出 */
+.VPHome .VPHero.VPHomeHero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--hm-dot) 1px, transparent 1.4px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(118% 86% at 50% 0%, #000 2%, transparent 72%);
+  mask-image: radial-gradient(118% 86% at 50% 0%, #000 2%, transparent 72%);
+}
+
+.VPHome .VPHero.VPHomeHero .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   §4 Hero 文案区
+   ============================================================ */
+
+/* —— 状态胶囊 —— */
+.hm-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  margin: 0 0 22px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  font-family: var(--hm-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--hm-ink-2);
+  background: var(--hm-tint);
+  border: 1px solid var(--hm-line);
+}
+
+.hm-status__dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--hm-green);
+  box-shadow: 0 0 0 3px var(--hm-green-soft);
+}
+
+.hm-status__dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--hm-green);
+  opacity: 0.5;
+  animation: hm-ping 2.6s var(--hm-ease-soft) infinite;
+}
+
+.hm-status__id {
+  font-weight: 700;
+  color: var(--hm-ink);
+}
+
+.hm-status__sep {
+  color: var(--hm-ink-3);
+}
+
+/* —— 标题组 —— */
+.VPHome .VPHero .main .heading {
+  display: flex;
+  flex-direction: column;
+}
+
+.VPHome .VPHero .main .name,
+.VPHome .VPHero .main .name.clip {
+  max-width: none;
+  font-size: clamp(3.1rem, 7.4vw, 5.3rem);
+  line-height: 1.04;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--hm-ink);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+/* 标题末尾的光标：这个站点「随时在等待下一次提交」 */
+.hm-caret {
+  display: inline-block;
+  width: 0.1em;
+  height: 0.74em;
+  margin-left: 0.08em;
+  border-radius: 2px;
+  background: var(--hm-green);
+  animation: hm-blink 1.15s step-end infinite;
+}
+
+.hm-caret--panel {
+  width: 0.58em;
+  height: 1em;
+  margin-left: 0.45em;
+  vertical-align: -0.14em;
+  background: var(--hm-panel-green);
+}
+
+.VPHome .VPHero .main .text {
+  max-width: none;
+  margin-top: 16px;
+  font-size: clamp(1.04rem, 1.8vw, 1.34rem);
+  line-height: 1.55;
+  font-weight: 600;
+  letter-spacing: 0.002em;
+  color: var(--hm-ink);
+}
+
+.VPHome .VPHero .main .tagline {
+  max-width: 44ch;
+  padding-top: 16px;
+  font-size: clamp(0.94rem, 1.2vw, 1.04rem);
+  line-height: 1.9;
+  font-weight: 400;
+  color: var(--hm-ink-2);
+}
+
+/* —— 按钮 —— */
+.VPHome .VPHero .actions {
+  padding-top: 30px;
+  gap: 4px;
+}
+
+.VPHome .VPHero .actions .VPButton {
+  height: 48px;
+  /* 必须与 height 同步：VitePress 默认 .VPButton.medium 是 line-height: 38px 撑高度，
+     这里改用固定 height，若不同步行高，文字会贴顶（实测偏上约 4.5px）。
+     48 = 46 内容高 + 上下各 1px 边框。 */
+  line-height: 46px;
+  padding: 0 26px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: transform 0.32s var(--hm-ease), box-shadow 0.32s var(--hm-ease),
+    background-color 0.26s ease, border-color 0.26s ease, color 0.26s ease;
+}
+
+.VPHome .VPHero .actions .VPButton.brand {
+  background: var(--hm-btn-bg);
+  border-color: transparent;
+  color: var(--hm-btn-fg);
+  box-shadow: 0 16px 34px -18px var(--hm-btn-shadow);
+}
+
+.VPHome .VPHero .actions .VPButton.brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px -20px var(--hm-btn-shadow);
+}
+
+.VPHome .VPHero .actions .VPButton.alt {
+  background: transparent;
+  border: 1px solid var(--hm-line-strong);
+  color: var(--hm-ink);
+}
+
+.VPHome .VPHero .actions .VPButton.alt:hover {
+  transform: translateY(-2px);
+  background: var(--hm-tint);
+  border-color: var(--hm-ink);
+}
+
+/* —— 快捷路径（终端风格） —— */
+.hm-paths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 26px 0 0;
+}
+
+.hm-paths__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.hm-paths__path {
+  font-family: var(--hm-mono);
+  font-size: 0.8rem;
+  color: var(--hm-ink-2);
+  transition: color 0.22s ease;
+}
+
+.hm-paths__label {
+  font-size: 0.8rem;
+  color: var(--hm-ink-3);
+  transition: color 0.22s ease;
+}
+
+.hm-paths__item:hover .hm-paths__path {
+  color: var(--hm-green);
+}
+
+.hm-paths__item:hover .hm-paths__label {
+  color: var(--hm-ink-2);
+}
+
+.VPHome .VPHero.has-image .hm-paths {
+  justify-content: center;
+}
+
+@media (min-width: 960px) {
+  .VPHome .VPHero.has-image .hm-paths {
+    justify-content: flex-start;
+  }
+}
+
+/* ============================================================
+   §5 评测机面板（HomeJudge）
+   ============================================================ */
+
+/* 复位默认 hero 图片容器 */
+.VPHome .VPHero .image {
+  position: relative;
+  z-index: 2;
+}
+
+.VPHome .VPHero .image .image-container {
+  width: auto;
+  height: auto;
+  padding: 0;
+  transform: none;
+}
+
+.VPHome .VPHero .image .image-bg {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .VPHome .VPHero .image .image-container {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.hm-judge {
+  position: relative;
+  width: min(100%, 452px);
+  margin: 0 auto;
+}
+
+/* 面板背后的色雾 */
+.hm-judge__glow {
+  position: absolute;
+  inset: 8% -8% -10% -12%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(58% 52% at 26% 22%, var(--hm-glow-a), transparent 70%),
+    radial-gradient(52% 48% at 84% 80%, var(--hm-glow-b), transparent 70%);
+  filter: blur(26px);
+}
+
+/* —— 编辑器窗口 —— */
+.hm-editor {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  border-radius: var(--hm-radius);
+  overflow: hidden;
+  background: var(--hm-panel-bg);
+  border: 1px solid var(--hm-panel-line);
+  box-shadow: var(--hm-panel-shadow);
+}
+
+.hm-editor__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--hm-panel-bar);
+  border-bottom: 1px solid var(--hm-panel-line);
+}
+
+.hm-dots {
+  display: inline-flex;
+  gap: 6px;
+  flex: none;
+}
+
+.hm-dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3d4451;
+}
+
+.hm-dots i:nth-child(1) {
+  background: #ff5f57;
+}
+
+.hm-dots i:nth-child(2) {
+  background: #febc2e;
+}
+
+.hm-dots i:nth-child(3) {
+  background: #28c840;
+}
+
+.hm-editor__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  font-family: var(--hm-mono);
+  font-size: 0.74rem;
+  color: #e6edf3;
+}
+
+.hm-editor__tab svg {
+  width: 13px;
+  height: 13px;
+  color: #7d8590;
+}
+
+.hm-editor__lang {
+  margin-left: auto;
+  font-family: var(--hm-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: #7d8590;
+}
+
+.hm-editor__code {
+  margin: 0;
+  padding: 14px 0 16px;
+  font-family: var(--hm-mono);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--hm-panel-ink);
+  counter-reset: hm-line;
+  overflow: hidden;
+}
+
+.hm-editor__code code {
+  display: block;
+  font-family: inherit;
+}
+
+.hm-editor__line {
+  display: block;
+  padding: 0 18px 0 14px;
+  min-height: 1.7em;
+  white-space: pre;
+  counter-increment: hm-line;
+  animation: hm-line-in 0.5s var(--hm-ease) both;
+}
+
+/* 行号：inline-block 而非 flex 子项 —— 若把行走 flex 布局，每个语法着色
+   的 token span 都会变成 flex item，被 gap 撑开成「松散」的代码。 */
+.hm-editor__line::before {
+  content: counter(hm-line);
+  display: inline-block;
+  width: 2.2ch;
+  margin-right: 16px;
+  text-align: right;
+  color: #4a5568;
+}
+
+/* 语法着色（作用域限定在代码行内，避免全局类名冲突） */
+.hm-editor__line .t-c {
+  color: #7d8590;
+  font-style: italic;
+}
+
+.hm-editor__line .t-k {
+  color: #ff7b72;
+}
+
+.hm-editor__line .t-s {
+  color: #a5d6ff;
+}
+
+.hm-editor__line .t-n {
+  color: var(--hm-panel-ink);
+}
+
+.hm-editor__status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 16px;
+  background: var(--hm-panel-status-bg);
+  border-top: 1px solid var(--hm-panel-status-line);
+  font-family: var(--hm-mono);
+  font-size: 0.74rem;
+}
+
+.hm-editor__verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--hm-panel-green);
+  animation: hm-pop 0.5s var(--hm-ease) both;
+  animation-delay: 1.05s;
+}
+
+.hm-editor__verdict svg {
+  width: 13px;
+  height: 13px;
+}
+
+.hm-editor__stat {
+  color: var(--hm-panel-ink-2);
+}
+
+.hm-editor__verdict + .hm-editor__stat {
+  margin-left: auto;
+}
+
+/* —— 终端窗口 —— */
+.hm-shell {
+  position: relative;
+  z-index: 2;
+  width: 88%;
+  margin: 12px 0 0;
+  padding: 11px 14px 12px;
+  border-radius: 12px;
+  background: var(--hm-panel-bg);
+  border: 1px solid var(--hm-panel-line);
+  box-shadow: var(--hm-panel-shadow);
+  font-family: var(--hm-mono);
+  font-size: 0.74rem;
+  line-height: 1.9;
+}
+
+.hm-shell__line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: hm-line-in 0.5s var(--hm-ease) both;
+}
+
+.hm-shell__line:nth-child(1) {
+  animation-delay: 1.15s;
+}
+
+.hm-shell__line:nth-child(2) {
+  animation-delay: 1.3s;
+}
+
+.hm-shell__prompt {
+  color: var(--hm-panel-green);
+  font-weight: 700;
+}
+
+.hm-shell__cmd {
+  color: #c9d1d9;
+}
+
+.hm-shell__caret {
+  flex: none;
+  width: 7px;
+  height: 13px;
+  border-radius: 1px;
+  background: var(--hm-panel-green);
+  animation: hm-blink 1.15s step-end infinite;
+}
+
+/* ============================================================
+   §6 分区骨架与标题组
+   ============================================================ */
+.hm-section {
+  max-width: var(--hm-max);
+  margin: 0 auto;
+  padding: 0 var(--hm-gutter);
+}
+
+.hm-section + .hm-section {
+  padding-top: 92px;
+}
+
+.hm-head {
+  max-width: 760px;
+  margin-bottom: 36px;
+}
+
+.hm-head__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-family: var(--hm-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--hm-green);
+}
+
+.hm-head__eyebrow::before {
+  content: '';
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hm-green);
+  opacity: 0.85;
+}
+
+.hm-head__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.9vw, 2.05rem);
+  font-weight: 750;
+  line-height: 1.3;
+  letter-spacing: -0.022em;
+  color: var(--hm-ink);
+}
+
+/* 中文标题避免「孤字行」；不支持的浏览器直接忽略 */
+.hm-head__title,
+.hm-card__title,
+.hm-step__title,
+.hm-cta__title {
+  text-wrap: pretty;
+}
+
+.hm-head__sub {
+  margin: 13px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.85;
+  color: var(--hm-ink-2);
+}
+
+/* ============================================================
+   §7 数据带
+   ============================================================ */
+.hm-stats {
+  padding-top: 6px;
+}
+
+.hm-stats__row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hm-line);
+}
+
+.hm-stats__item {
+  padding: 26px 26px 28px;
+  border-bottom: 1px solid var(--hm-line);
+}
+
+.hm-stats__item + .hm-stats__item {
+  border-left: 1px solid var(--hm-line);
+}
+
+.hm-stats__tag {
+  margin: 0;
+  font-family: var(--hm-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  color: var(--hm-ink-3);
+}
+
+.hm-stats__value {
+  margin: 10px 0 0;
+  font-family: var(--hm-mono);
+  font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  color: var(--hm-ink);
+}
+
+.hm-stats__value span {
+  margin-left: 2px;
+  font-size: 0.62em;
+  color: var(--hm-green);
+}
+
+.hm-stats__label {
+  margin: 9px 0 0;
+  font-size: 0.86rem;
+  color: var(--hm-ink-2);
+}
+
+/* ============================================================
+   §8 板块地图（bento）
+   ============================================================ */
+.hm-bento {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.hm-card {
+  grid-column: span 2;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  border-radius: var(--hm-radius);
+  background: var(--hm-tint);
+  border: 1px solid var(--hm-line);
+  color: var(--hm-ink);
+  text-decoration: none;
+  transition: transform 0.38s var(--hm-ease), border-color 0.3s ease,
+    background-color 0.3s ease, box-shadow 0.38s var(--hm-ease);
+}
+
+.hm-card--lg {
+  grid-column: span 3;
+  padding: 28px 26px 26px;
+}
+
+.hm-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--hm-line-strong);
+  background: var(--hm-tint-hover);
+  box-shadow: var(--hm-card-hover-shadow);
+}
+
+.hm-card:focus-visible {
+  outline: 2px solid var(--hm-green);
+  outline-offset: 3px;
+}
+
+.hm-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.hm-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--hm-chip-bg);
+  border: 1px solid var(--hm-line);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  color: var(--hm-ink-2);
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .hm-card__icon {
+  box-shadow: none;
+}
+
+.hm-card__icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.hm-card:hover .hm-card__icon {
+  color: var(--hm-green);
+  border-color: var(--hm-green-soft);
+}
+
+.hm-card__no {
+  font-family: var(--hm-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: var(--hm-ink-3);
+  transition: color 0.3s ease;
+}
+
+.hm-card:hover .hm-card__no {
+  color: var(--hm-green);
+}
+
+.hm-card__title {
+  margin: 2px 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.012em;
+  color: var(--hm-ink);
+}
+
+.hm-card--lg .hm-card__title {
+  font-size: 1.13rem;
+}
+
+.hm-card__desc {
+  flex: 1;
+  margin: 0;
+  font-size: 0.87rem;
+  line-height: 1.8;
+  color: var(--hm-ink-2);
+}
+
+.hm-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.hm-card__tag {
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-family: var(--hm-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: var(--hm-ink-2);
+  background: var(--hm-chip-bg);
+  border: 1px solid var(--hm-line);
+}
+
+.hm-card__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--hm-ink);
+}
+
+.hm-card__more svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.3s var(--hm-ease);
+}
+
+.hm-card:hover .hm-card__more {
+  color: var(--hm-green);
+}
+
+.hm-card:hover .hm-card__more svg {
+  transform: translateX(4px);
+}
+
+/* ============================================================
+   §9 进阶阶梯（题目列表隐喻）
+   ============================================================ */
+.hm-ladder {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hm-line);
+}
+
+.hm-step {
+  border-bottom: 1px solid var(--hm-line);
+}
+
+/* 四档难度色（在 li 上定义，供题号与难度章继承） */
+.hm-step--g1 {
+  --tone: var(--hm-rank-1);
+  --tone-soft: var(--hm-rank-1-soft);
+}
+
+.hm-step--g2 {
+  --tone: var(--hm-rank-2);
+  --tone-soft: var(--hm-rank-2-soft);
+}
+
+.hm-step--g3 {
+  --tone: var(--hm-rank-3);
+  --tone-soft: var(--hm-rank-3-soft);
+}
+
+.hm-step--g4 {
+  --tone: var(--hm-rank-4);
+  --tone-soft: var(--hm-rank-4-soft);
+}
+
+.hm-step__link {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 22px;
+  padding: 20px 16px;
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.26s ease;
+}
+
+.hm-step__link:hover {
+  background: var(--hm-tint);
+}
+
+.hm-step__key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  font-family: var(--hm-mono);
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--tone);
+  background: var(--tone-soft);
+}
+
+.hm-step__main {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.hm-step__title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--hm-ink);
+}
+
+.hm-step__desc {
+  font-size: 0.87rem;
+  line-height: 1.75;
+  color: var(--hm-ink-2);
+}
+
+.hm-step__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hm-step__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  font-family: var(--hm-mono);
+  font-size: 0.72rem;
+  white-space: nowrap;
+  color: var(--tone);
+  background: var(--tone-soft);
+}
+
+.hm-step__chip b {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.hm-step__chip em {
+  font-style: normal;
+  opacity: 0.78;
+}
+
+.hm-step__hint {
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--hm-ink-2);
+  transition: color 0.26s ease;
+}
+
+.hm-step__arrow {
+  width: 16px;
+  height: 16px;
+  color: var(--hm-ink-3);
+  transition: transform 0.3s var(--hm-ease), color 0.26s ease;
+}
+
+.hm-step__link:hover .hm-step__hint {
+  color: var(--hm-green);
+}
+
+.hm-step__link:hover .hm-step__arrow {
+  color: var(--hm-green);
+  transform: translateX(4px);
+}
+
+/* ============================================================
+   §10 终端式 CTA
+   ============================================================ */
+.hm-cta {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--hm-radius-lg);
+  background-color: #0a0e15;
+  background-image:
+    radial-gradient(720px 320px at 10% -4%, rgba(12, 158, 86, 0.32), transparent 64%),
+    radial-gradient(640px 300px at 90% 104%, rgba(37, 99, 235, 0.28), transparent 62%),
+    linear-gradient(180deg, #0c1119 0%, #070a10 100%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 46px 90px -52px rgba(2, 6, 16, 0.9);
+}
+
+.hm-cta__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hm-cta__shell,
+.hm-cta__term {
+  font-family: var(--hm-mono);
+  font-size: 0.73rem;
+  color: rgba(190, 205, 228, 0.55);
+}
+
+.hm-cta__term {
+  margin-left: auto;
+  opacity: 0.7;
+}
+
+.hm-cta__body {
+  padding: 42px 42px 36px;
+}
+
+.hm-cta__cmd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 24px;
+  font-family: var(--hm-mono);
+  font-size: 0.84rem;
+  color: rgba(190, 205, 228, 0.62);
+}
+
+.hm-cta__cmd > span:first-child {
+  color: var(--hm-panel-green);
+  font-weight: 700;
+}
+
+.hm-cta__run {
+  color: #e6edf3;
+}
+
+.hm-cta__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 3.1vw, 2.3rem);
+  font-weight: 780;
+  line-height: 1.28;
+  letter-spacing: -0.024em;
+  color: #f4f8ff;
+}
+
+.hm-cta__desc {
+  max-width: 52ch;
+  margin: 14px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.88;
+  color: rgba(212, 225, 244, 0.72);
+}
+
+.hm-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.hm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 12px;
+  font-size: 0.93rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.3s var(--hm-ease), background-color 0.26s ease,
+    border-color 0.26s ease, box-shadow 0.3s var(--hm-ease);
+}
+
+.hm-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.hm-btn--solid {
+  background: #f4f8ff;
+  color: #0b1220;
+  box-shadow: 0 16px 34px -18px rgba(190, 220, 255, 0.55);
+}
+
+.hm-btn--solid:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px -18px rgba(190, 220, 255, 0.7);
+}
+
+.hm-btn--ghost {
+  color: #eaf1ff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.hm-btn--ghost:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+.hm-cta__hint {
+  margin: 26px 0 0;
+  font-family: var(--hm-mono);
+  font-size: 0.74rem;
+  color: rgba(184, 200, 224, 0.46);
+}
+
+.hm-cta__hint kbd {
+  display: inline-block;
+  margin: 0 2px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  color: rgba(226, 238, 255, 0.85);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* 首页底部的呼吸留白 */
+.VPHome {
+  margin-bottom: 110px;
+}
+
+/* ============================================================
+   §11 内容页（点进去之后的文档页）
+   —— 纯表现层美化：不新增/修改任何正文文本，装饰全部由 CSS 生成。
+   —— 分块：11.1 顶部氛围 / 11.2 阅读进度条 / 11.3 正文排版 /
+      11.4 自定义块 / 11.5 侧边栏 / 11.6 右侧目录 / 11.7 翻页器
+   ============================================================ */
+
+/* —— 11.1 页面顶部氛围（与首页同一套色雾语言，只作用于非首页） —— */
+.VPContent {
+  position: relative;
+}
+
+html:not(:has(.VPHome)) .VPContent::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 440px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(760px 340px at 12% -8%, var(--hm-wash-1), transparent 68%),
+    radial-gradient(660px 300px at 90% -2%, var(--hm-wash-2), transparent 70%);
+}
+
+/* —— 11.2 阅读进度条（Layout.vue 注入 layout-top，首页由 :has 隐藏） —— */
+.hm-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.hm-progress span {
+  display: block;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--hm-green), var(--hm-accent-2));
+}
+
+html:has(.VPHome) .hm-progress {
+  display: none;
+}
+
+/* —— 11.3 正文排版 —— */
 .vp-doc {
   font-size: 16px;
-  line-height: 1.8;
+  line-height: 1.85;
+  animation: hm-doc-in 0.5s var(--hm-ease) both;
 }
 
 .vp-doc p {
   margin: 16px 0;
 }
 
-.vp-doc :not(pre) > code {
-  font-size: 0.875em;
-  border-radius: 4px;
-  padding: 3px 6px;
-  font-weight: 600;
-}
-
-/* 标题层级更清晰 */
 .vp-doc h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 2.05rem;
+  font-weight: 800;
+  letter-spacing: -0.026em;
+  color: var(--hm-ink);
 }
 
+/* 标题下的渐变短线：给每个页面一个「被标注过」的开场 */
+.vp-doc h1::after {
+  content: '';
+  display: block;
+  width: 68px;
+  height: 4px;
+  margin-top: 14px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--hm-green), var(--hm-accent-2) 70%, transparent);
+  opacity: 0.85;
+}
+
+/* h2：顶部发丝分隔线（向右淡出）+ 绿色短横装饰。
+   注意不能用 padding-left 加左侧竖条 —— VitePress 的 header-anchor 锚点
+   就定位在标题左侧（margin-left: -0.87em），会互相压住。 */
 .vp-doc h2 {
+  border-top: none;
+  padding-top: 26px;
+  margin-top: 58px;
+  margin-bottom: 4px;
   font-size: 1.5rem;
   font-weight: 700;
-  border-top: 1px solid var(--vp-c-divider);
-  padding-top: 24px;
-  margin-top: 48px;
+  letter-spacing: -0.018em;
+  color: var(--hm-ink);
+  background-image: linear-gradient(90deg, var(--hm-line-strong), transparent 72%);
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: 0 0;
+}
+
+.vp-doc h2::after {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 3px;
+  margin-top: 12px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--hm-green), var(--hm-accent-2));
 }
 
 .vp-doc h3 {
   font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  color: var(--hm-ink);
+}
+
+/* h3 前的小方点：层级低于 h2 的短横，纯装饰 */
+.vp-doc h3::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 10px;
+  border-radius: 2.5px;
+  background: var(--hm-green);
+  vertical-align: 0.06em;
+}
+
+.vp-doc h4 {
+  color: var(--hm-ink);
   font-weight: 650;
 }
 
-/* 代码块：圆角 + 更柔和的背景 */
+/* 链接：悬停时渐变下划线从左向右展开（锚点 # 除外） */
+.vp-doc a:not(.header-anchor) {
+  font-weight: 500;
+  text-decoration: none;
+  background-image: var(--hm-grad-link);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1.5px;
+  transition: background-size 0.32s var(--hm-ease), color 0.2s ease;
+}
+
+.vp-doc a:not(.header-anchor):hover {
+  background-size: 100% 1.5px;
+  text-decoration: none;
+}
+
+.vp-doc .header-anchor {
+  color: var(--hm-green);
+}
+
+/* 列表标记跟随签名色 */
+.vp-doc li::marker {
+  color: var(--hm-green);
+}
+
+/* 行内代码：绿调芯片 */
+.vp-doc :not(pre) > code {
+  font-size: 0.875em;
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-weight: 600;
+  color: var(--hm-code-ink);
+  background: var(--hm-code-bg);
+}
+
+/* 引用块：左侧绿条 + 浅底 */
+.vp-doc blockquote {
+  margin: 20px 0;
+  padding: 14px 18px;
+  border-left: 3px solid var(--hm-green);
+  border-radius: 0 12px 12px 0;
+  background: var(--hm-tint);
+  color: var(--hm-ink-2);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.vp-doc blockquote > p {
+  margin: 6px 0;
+}
+
 .vp-doc div[class*='language-'] {
-  border-radius: 10px;
+  border-radius: 12px;
   margin: 16px 0;
 }
 
 .vp-doc div[class*='language-'] pre {
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
-/* 表格：斑马纹 + 圆角 */
+/* 表格：发丝边框 + 表头淡底 + 行悬停高亮 */
 .vp-doc table {
   display: table;
   width: 100%;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--hm-line);
   border-collapse: separate;
   border-spacing: 0;
-  margin: 16px 0;
+  margin: 20px 0;
 }
 
 .vp-doc table tbody tr:nth-child(odd) {
   background-color: var(--vp-c-bg-soft);
 }
 
+.vp-doc table tbody tr {
+  transition: background-color 0.18s ease;
+}
+
+.vp-doc table tbody tr:hover {
+  background-color: var(--hm-tint-hover);
+}
+
 .vp-doc table th {
   font-weight: 650;
+  color: var(--hm-ink);
+  background: var(--hm-tint);
 }
 
-/* 引用块更精致 */
-.vp-doc blockquote {
-  border-radius: 0 8px 8px 0;
-  font-style: normal;
-  font-weight: 500;
-}
-
-/* 链接 hover 颜色统一 */
-.vp-doc a {
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.vp-doc a:hover {
-  text-decoration: underline;
-}
-
-/* 图片：圆角 + 居中阴影 */
+/* 图片：发丝描边 + 悬停浮起 */
 .vp-doc img {
-  border-radius: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--hm-line);
+  transition: box-shadow 0.3s ease;
 }
 
-.main img {
-  box-shadow: var(--vp-shadow-2);
+.vp-doc img:hover {
+  box-shadow: 0 22px 48px -28px rgba(11, 18, 32, 0.5);
 }
 
-/* ===== 主页 hero ===== */
-.VPHome .VPHero {
-  padding-bottom: 48px !important;
+.dark .vp-doc img:hover {
+  box-shadow: 0 22px 48px -28px rgba(0, 0, 0, 0.85);
 }
 
-.VPHome .VPHero .container {
-  position: relative;
+/* 分隔线：中间实、两端虚 */
+.vp-doc hr {
+  height: 1px;
+  border: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--hm-line-strong) 18%,
+    var(--hm-line-strong) 82%,
+    transparent
+  );
 }
 
-.VPHome .VPHero .main {
-  z-index: 1;
+/* —— 11.4 自定义块（tip / warning / info / danger） —— */
+.vp-doc .custom-block {
+  border-radius: 12px;
+  box-shadow: inset 3px 0 0 transparent;
 }
 
-.VPHome .VPHero .name,
-.VPHome .VPHero .text {
-  max-width: 100% !important;
+.vp-doc .custom-block-title {
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
-.VPHome .VPHero .name {
-  font-size: 4.2rem !important;
-  line-height: 1.2 !important;
-  letter-spacing: -0.02em;
+.vp-doc .custom-block.tip {
+  border-color: var(--hm-cb-tip-line);
+  background-color: var(--hm-cb-tip-bg);
+  box-shadow: inset 3px 0 0 var(--hm-cb-tip);
 }
 
-.VPHome .VPHero .text {
-  font-size: 1.8rem !important;
-  line-height: 1.5 !important;
-  padding-top: 12px;
+.vp-doc .custom-block.tip .custom-block-title {
+  color: var(--hm-cb-tip);
 }
 
-.VPHome .VPHero .tagline {
-  font-size: 1.6rem !important;
-  font-weight: 700 !important;
-  padding-top: 16px;
-  line-height: 1.6 !important;
+.vp-doc .custom-block.warning {
+  border-color: var(--hm-cb-warn-line);
+  background-color: var(--hm-cb-warn-bg);
+  box-shadow: inset 3px 0 0 var(--hm-cb-warn);
 }
 
-.VPHome .VPHero .tagline .studio-highlight {
-  font-size: 2rem !important;
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+.vp-doc .custom-block.warning .custom-block-title {
+  color: var(--hm-cb-warn);
 }
 
-.VPHome .VPHero .tagline .studio-gray {
-  color: var(--vp-c-text-2);
-  -webkit-text-fill-color: var(--vp-c-text-2);
+.vp-doc .custom-block.info {
+  border-color: var(--hm-cb-info-line);
+  background-color: var(--hm-cb-info-bg);
+  box-shadow: inset 3px 0 0 var(--hm-cb-info);
 }
 
-.VPHome .VPHero .tagline .studio-sub {
-  font-size: 0.9rem !important;
+.vp-doc .custom-block.info .custom-block-title {
+  color: var(--hm-cb-info);
 }
 
-/* 入门指北按钮同配色 */
-.VPHome .VPHero .actions .action:first-child .VPButton.brand {
-  background: linear-gradient(135deg, #4facfe, #00f2fe) !important;
-  border-color: transparent !important;
-  color: #fff !important;
-}
-.VPHome .VPHero .actions .action:first-child .VPButton.brand:hover {
-  background: linear-gradient(135deg, #3d9ef0, #00ddf0) !important;
-  border-color: transparent !important;
-  color: #fff !important;
+.vp-doc .custom-block.danger {
+  border-color: var(--hm-cb-danger-line);
+  background-color: var(--hm-cb-danger-bg);
+  box-shadow: inset 3px 0 0 var(--hm-cb-danger);
 }
 
-
-
-.VPHome .VPHero .image-container img {
-  max-height: 340px;
-  width: auto;
-  filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.2));
-  transition: transform 0.4s ease;
+.vp-doc .custom-block.danger .custom-block-title {
+  color: var(--hm-cb-danger);
 }
 
-/* 去掉 hero 图标 hover 动效（用户要求图标不动） */
-
-/* Hero 背景渐变光晕 */
-.VPHome .VPHero::before {
-  content: '';
-  position: absolute;
-  top: -10%;
-  left: -10%;
-  width: 120%;
-  height: 120%;
-  background: radial-gradient(ellipse at 30% 50%, var(--vp-c-brand-soft) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
+.vp-doc .custom-block code {
+  background: rgba(15, 23, 42, 0.07);
+  color: var(--hm-ink-2);
 }
 
-/* 主页 feature 卡片：更精致的 hover 动效 */
-.VPFeatures {
-  padding-top: 24px !important;
+.dark .vp-doc .custom-block code {
+  background: rgba(255, 255, 255, 0.09);
 }
 
-.VPFeatures .container {
-  position: relative;
-  z-index: 1;
-}
-
-.VPFeatures .item {
-  border-radius: 14px;
-  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
-  border: 1px solid transparent;
-}
-
-.VPFeatures .item:hover {
-  transform: translateY(-6px) scale(1.01);
-  border-color: var(--vp-c-brand-soft);
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(58, 142, 230, 0.06);
-}
-
-.VPFeatures .VPLink:hover .title {
-  color: var(--vp-c-brand-1);
-}
-
-/* Feature 卡片 icon 放大 */
-.VPFeatures .icon {
-  font-size: 1.8rem !important;
-  transition: transform 0.28s ease;
-}
-
-.VPFeatures .item:hover .icon {
-  transform: scale(1.15);
-}
-
-/* Feature 卡片标题 */
-.VPFeatures .title {
-  font-size: 1.1rem !important;
-  font-weight: 650 !important;
+/* —— 11.5 侧边栏：悬停与激活态走签名绿 ——
+   注意：VitePress 的激活色规则带 scoped 属性（.level-N.is-active ... .text[data-v]），
+   权重很高且色值就是 var(--vp-c-brand-1)，所以颜色统一在 §2 改品牌变量解决；
+   这里只补它没定义的 font-weight 与悬停态。 */
+.VPSidebarItem .link .text {
   transition: color 0.2s ease;
 }
 
-/* Feature 卡片描述 */
-.VPFeatures .details {
-  font-size: 0.92rem !important;
-  line-height: 1.65 !important;
-  opacity: 0.82;
+.VPSidebarItem .link:hover .text {
+  color: var(--hm-green);
 }
 
-/* 颜色微调：品牌色更沉稳的蓝绿 */
-:root {
-  --vp-c-brand-1: #3a8ee6;
-  --vp-c-brand-2: #2d7dd2;
-  --vp-c-brand-3: #1f6bb8;
-  --vp-c-brand-soft: rgba(58, 142, 230, 0.14);
+.VPSidebarItem.level-0.is-active > .item .link > .text,
+.VPSidebarItem.level-1.is-active > .item .link > .text,
+.VPSidebarItem.level-2.is-active > .item .link > .text,
+.VPSidebarItem.level-3.is-active > .item .link > .text,
+.VPSidebarItem.level-4.is-active > .item .link > .text,
+.VPSidebarItem.level-5.is-active > .item .link > .text {
+  font-weight: 700;
 }
 
-/* 深色模式微调 */
-.dark .VPFeatures .item:hover {
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(58, 142, 230, 0.12);
+/* —— 11.6 右侧目录 ——
+   滑块（.outline-marker）的底色来自 --vp-c-brand-1，已随品牌绿一起变绿；
+   激活项默认是 text-1（墨色），这里改成绿 + 加粗，并提升一级权重避免被
+   scoped 规则盖掉。 */
+.VPDocAsideOutline .outline-title {
+  font-weight: 700;
 }
 
-.dark .VPHome .VPHero::before {
-  background: radial-gradient(ellipse at 30% 50%, rgba(58, 142, 230, 0.1) 0%, transparent 60%);
+.VPDocAsideOutline .content .outline-link {
+  transition: color 0.2s ease;
+}
+
+.VPDocAsideOutline .content .outline-link:hover {
+  color: var(--hm-ink);
+}
+
+.VPDocAsideOutline .content .outline-link.active {
+  color: var(--hm-green);
+  font-weight: 600;
+}
+
+/* —— 11.7 上一页 / 下一页：卡片化 —— */
+.VPDocFooter {
+  margin-top: 64px;
+  padding-top: 28px;
+  background-image: linear-gradient(90deg, var(--hm-line-strong), transparent 72%);
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: 0 0;
+}
+
+.VPDocFooter .pager .pager-link {
+  border-radius: 12px;
+  transition: transform 0.3s var(--hm-ease), border-color 0.3s ease,
+    background-color 0.3s ease, box-shadow 0.3s var(--hm-ease);
+}
+
+.VPDocFooter .pager .pager-link:hover {
+  border-color: var(--hm-green);
+  background-color: var(--hm-tint);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px -28px rgba(11, 18, 32, 0.55);
+}
+
+.dark .VPDocFooter .pager .pager-link:hover {
+  box-shadow: 0 18px 38px -28px rgba(0, 0, 0, 0.9);
+}
+
+.VPDocFooter .pager .pager-link .title {
+  color: var(--hm-ink);
+  font-weight: 600;
+}
+
+.VPDocFooter .pager .pager-link .desc {
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   §12 动效
+   ============================================================ */
+@keyframes hm-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes hm-ping {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.7);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* 首屏入场：只作用于 Hero（一定在首屏内），不依赖滚动 */
+@keyframes hm-rise {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes hm-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hm-line-in {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 内容页换页时的轻量入场（路由切换会重建 .vp-doc 节点，动画随之重放） */
+@keyframes hm-doc-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.hm-status,
+.VPHome .VPHero .main .heading,
+.VPHome .VPHero .main .tagline,
+.VPHome .VPHero .actions,
+.hm-paths,
+.hm-judge {
+  animation: hm-rise 0.66s var(--hm-ease) both;
+}
+
+.VPHome .VPHero .main .heading {
+  animation-delay: 0.06s;
+}
+
+.VPHome .VPHero .main .tagline {
+  animation-delay: 0.12s;
+}
+
+.VPHome .VPHero .actions {
+  animation-delay: 0.18s;
+}
+
+.hm-paths {
+  animation-delay: 0.24s;
+}
+
+.hm-judge {
+  animation-delay: 0.12s;
+}
+
+/* ============================================================
+   §13 响应式
+   ============================================================ */
+@media (max-width: 1000px) {
+  .hm-bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hm-card,
+  .hm-card--lg {
+    grid-column: span 1;
+  }
+
+  .hm-card--lg {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 900px) {
+  .hm-stats__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hm-stats__item + .hm-stats__item {
+    border-left: none;
+  }
+
+  .hm-stats__item:nth-child(even) {
+    border-left: 1px solid var(--hm-line);
+  }
+}
+
+@media (max-width: 959px) {
+  .VPHome .VPHero.VPHomeHero {
+    padding: calc(var(--vp-nav-height) + 48px) var(--hm-gutter) 72px;
+  }
+
+  /* 移动端：文案在前，评测面板在后 */
+  .VPHome .VPHero .image {
+    order: 3;
+    margin: 34px 0 0;
+  }
+
+  .VPHome .VPHero .main .tagline {
+    margin-inline: auto;
+  }
+
+  .hm-judge {
+    width: min(100%, 430px);
+  }
+}
+
+@media (max-width: 760px) {
+  .hm-step__link {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 8px 16px;
+    padding: 18px 12px;
+  }
+
+  .hm-step__main {
+    grid-column: 2;
+  }
+
+  .hm-step__meta {
+    grid-column: 2;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --hm-gutter: 20px;
+  }
+
+  .hm-bento {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hm-card--lg {
+    grid-column: span 1;
+  }
+
+  .hm-section + .hm-section {
+    padding-top: 64px;
+  }
+
+  .hm-cta__body {
+    padding: 30px 22px 26px;
+  }
+
+  .hm-cta__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hm-btn {
+    justify-content: center;
+  }
+
+  .VPHome .VPHero .main .name {
+    font-size: clamp(2.7rem, 13vw, 3.4rem);
+  }
+
+  .hm-paths {
+    gap: 6px 16px;
+  }
+
+  .hm-shell {
+    width: 100%;
+    font-size: 0.7rem;
+  }
+
+  .hm-editor__code {
+    font-size: 0.74rem;
+  }
+}
+
+/* ============================================================
+   §14 降低动效偏好
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  .vp-doc {
+    animation: none !important;
+  }
+
+  .hm-status,
+  .hm-status__dot::after,
+  .hm-caret,
+  .hm-shell__caret,
+  .hm-editor__line,
+  .hm-editor__verdict,
+  .hm-shell__line,
+  .VPHome .VPHero .main .heading,
+  .VPHome .VPHero .main .tagline,
+  .VPHome .VPHero .actions,
+  .hm-paths,
+  .hm-judge {
+    animation: none !important;
+  }
+
+  .hm-card,
+  .hm-card__icon,
+  .hm-card__more svg,
+  .hm-step__link,
+  .hm-step__arrow,
+  .hm-btn,
+  .VPHome .VPHero .actions .VPButton,
+  .hm-paths__path,
+  .hm-paths__label {
+    transition: none !important;
+  }
+
+  .hm-card:hover,
+  .hm-step__link:hover,
+  .hm-btn:hover,
+  .VPHome .VPHero .actions .VPButton:hover {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   §15 可访问性收尾
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--hm-green);
+  outline-offset: 2px;
+}
+
+::selection {
+  background-color: var(--hm-green-soft);
 }

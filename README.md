@@ -42,3 +42,37 @@ npm run docs:preview
 ├── study/                  # 学习资料
 └── package.json
 ```
+
+## 首页主题（v2 ·「判题机」）
+
+首页不写正文 Markdown，而是由 `index.md` 的 hero 文案 + `theme/Layout.vue`
+注入的四个插槽拼装：
+
+| 插槽 | 内容 | 组件 |
+| --- | --- | --- |
+| `home-hero-info-before` | 状态胶囊（608 / Algorithm Training Team） | Layout.vue 内联 |
+| `home-hero-actions-after` | 终端风格快捷路径（`./guide` 等） | Layout.vue 内联 |
+| `home-hero-image` | 「评测机」面板（编辑器 + 终端） | `components/HomeJudge.vue` |
+| `home-features-after` | 数据带 / 板块地图 / 进阶阶梯 / CTA | `components/HomeSections.vue` |
+
+几个维护要点：
+
+- 右侧面板**不通过 frontmatter 的 `hero.image` 配置**：VPHero 会检测
+  `home-hero-image` 插槽是否存在，存在即启用双栏（`.has-image`）布局。
+- 所有首页样式集中在 `theme/style.css` 的 `--hm-*` 令牌与 `.hm-*` 类名下，
+  `§11 内容页` 与首页解耦，改首页不会影响内容页。
+- 动效只发生在首屏入场与悬停（不做 scroll-driven reveal），
+  全部可被 `prefers-reduced-motion` 关闭。
+
+## 内容页主题（v2 增补）
+
+内容页（guide / contests / studio）在**不改动任何正文文本**的前提下做了表现层增强：
+阅读进度条（`Layout.vue` 注入 `layout-top`）、标题装饰线、链接悬停渐变下划线、
+侧边栏/目录/翻页器状态、自定义块（tip / warning）与引用块的绿调重绘等。
+
+- 全站品牌色统一为「Accepted 绿」，定义在 `style.css` §2 的 `--vp-c-brand-*`；
+  侧边栏激活态与目录滑块等由 VitePress 自身的 `var()` 驱动，改品牌变量即可生效。
+- 注意：部分 VitePress 组件的状态色带 scoped 属性（`.text[data-v-xxx]`），
+  权重很高，直接覆盖很费劲 —— 优先改上游 CSS 变量，其次才考虑提权。
+
+
