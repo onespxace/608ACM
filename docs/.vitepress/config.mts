@@ -27,6 +27,28 @@ export default defineConfig({
   ],
 
   /**
+   * 标题锚点的 slug 规则改为「GitHub 兼容」。
+   * 原因：站点会收录来自 GitHub 的文档（如 guide/smart-questions.md 的《提问的智慧》），
+   * 它们自带的目录锚点是按 GitHub 规则生成的（标点被删除、空格转连字符、
+   * 如 `#第二步使用项目邮件列表`）；而 VitePress 默认把特殊字符替换成连字符
+   * （`第二步，使用…` → `第二步-使用…`），两者对不上会导致目录整篇跳转失效。
+   * 该规则与 github-slugger 行为一致：小写 → 空白转 `-` → 删除除
+   * 字母/数字/组合符/下划线/连字符以外的一切字符。
+   */
+  markdown: {
+    anchor: {
+      slugify: (str: string) =>
+        str
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^\p{L}\p{N}\p{M}_-]+/gu, '')
+          .replace(/-{2,}/g, '-')
+          .replace(/^-+|-+$/g, '')
+    }
+  },
+
+  /**
    * 两个插件都会被 SSR 引用，必须 noExternal：
    * 否则 Node 侧会以原生 ESM 加载它们内部的 .css / .vue 而报
    * ERR_UNKNOWN_FILE_EXTENSION。Vite 的 mergeConfig 会把这里的数组与内置值拼接。
@@ -47,7 +69,8 @@ export default defineConfig({
         text: '入门指北',
         items: [
           { text: '算法竞赛入门指北', link: '/guide/' },
-          { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' }
+          { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
+          { text: '提问的智慧', link: '/guide/smart-questions' }
         ]
       },
       {
@@ -76,7 +99,8 @@ export default defineConfig({
           text: '入门指北',
           items: [
             { text: '算法竞赛入门指北', link: '/guide/' },
-            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' }
+            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
+            { text: '提问的智慧', link: '/guide/smart-questions' }
           ]
         },
         {
@@ -103,7 +127,8 @@ export default defineConfig({
           text: '入门指北',
           items: [
             { text: '算法竞赛入门指北', link: '/guide/' },
-            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' }
+            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
+            { text: '提问的智慧', link: '/guide/smart-questions' }
           ]
         },
         {
@@ -130,7 +155,8 @@ export default defineConfig({
           text: '入门指北',
           items: [
             { text: '算法竞赛入门指北', link: '/guide/' },
-            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' }
+            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
+            { text: '提问的智慧', link: '/guide/smart-questions' }
           ]
         },
         {
