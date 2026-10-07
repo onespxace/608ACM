@@ -74,10 +74,9 @@ export default defineConfig({
         ]
       },
       {
-        text: '软件设计创新工作室',
+        text: '算法组',
         items: [
-          { text: '工作室简介', link: '/studio/' },
-          { text: '算法组简介', link: '/studio/algorithm-team' },
+          { text: '简介', link: '/studio/' },
           { text: '加入我们', link: '/studio/join-us' }
         ]
       },
@@ -104,10 +103,9 @@ export default defineConfig({
           ]
         },
         {
-          text: '软件设计创新工作室',
+          text: '算法组',
           items: [
-            { text: '工作室简介', link: '/studio/' },
-            { text: '算法组简介', link: '/studio/algorithm-team' },
+            { text: '简介', link: '/studio/' },
             { text: '加入我们', link: '/studio/join-us' }
           ]
         },
@@ -132,10 +130,9 @@ export default defineConfig({
           ]
         },
         {
-          text: '软件设计创新工作室',
+          text: '算法组',
           items: [
-            { text: '工作室简介', link: '/studio/' },
-            { text: '算法组简介', link: '/studio/algorithm-team' },
+            { text: '简介', link: '/studio/' },
             { text: '加入我们', link: '/studio/join-us' }
           ]
         },
@@ -160,10 +157,9 @@ export default defineConfig({
           ]
         },
         {
-          text: '软件设计创新工作室',
+          text: '算法组',
           items: [
-            { text: '工作室简介', link: '/studio/' },
-            { text: '算法组简介', link: '/studio/algorithm-team' },
+            { text: '简介', link: '/studio/' },
             { text: '加入我们', link: '/studio/join-us' }
           ]
         },

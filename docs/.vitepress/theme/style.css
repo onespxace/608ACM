@@ -1,21 +1,21 @@
 /**
- * 608ACM 主题样式 v2 ——「判题机」
+ * 608ACM 主题样式 v3 ——「判题机」
  * ==================================================================
- * 设计概念：整页借用 OJ / IDE 的视觉语言 —— 纸张底 + 墨色排版 + Accepted 绿，
- * 右侧一块模拟评测面板（编辑器 + 终端）作为视觉锚点。
+ * 设计概念：整页借用 OJ / 赛场的视觉语言 —— 纸张底 + 墨色排版 + Accepted 绿，
+ * 右侧一张「现场榜单」记分牌（浅色纸面卡片）作为视觉锚点。
  *
  * 阅读地图：
  *   §1  设计令牌      —— 所有颜色/间距的唯一出处
  *   §2  VitePress 变量桥接
  *   §3  Hero 外壳     —— 浅色纸张 + 点阵网格
  *   §4  Hero 文案区   —— 状态胶囊 / 标题 / 按钮 / 快捷路径
- *   §5  评测机面板    —— 编辑器 + 终端（两种模式都保持深色）
+ *   §5  现场榜单卡片  —— 纸面记分牌（HomeBoard，HTML/CSS 绘制）
  *   §6  分区骨架与标题
  *   §7  数据带
  *   §8  板块地图（bento）
  *   §9  进阶阶梯
  *   §10 终端式 CTA
- *   §11 文档正文排版（内容页，与首页解耦）
+ *   §11 内容页（阅读进度条 / 排版 / 自定义块 / 侧边栏…）
  *   §12 动效 / §13 响应式 / §14 降级 / §15 收尾
  *
  * 两条硬约束（从上一版继承的教训）：
@@ -78,16 +78,11 @@
   --hm-cb-danger-bg: rgba(220, 38, 38, 0.06);
   --hm-cb-danger-line: rgba(220, 38, 38, 0.32);
 
-  /* 评测机面板：两种模式共用同一套深色，不做反色 */
-  --hm-panel-bg: #0b0f16;
-  --hm-panel-bar: #12161f;
-  --hm-panel-line: rgba(255, 255, 255, 0.08);
-  --hm-panel-shadow: 0 36px 70px -36px rgba(3, 8, 20, 0.55), 0 2px 10px rgba(3, 8, 20, 0.14);
-  --hm-panel-status-bg: rgba(16, 163, 90, 0.13);
-  --hm-panel-status-line: rgba(34, 197, 94, 0.26);
-  --hm-panel-green: #3ddc84;
-  --hm-panel-ink: #c9d1d9;
-  --hm-panel-ink-2: #8b949e;
+  /* 现场榜单卡片（HomeBoard）：纸面质感 + 彩色判题方块 */
+  --hm-board-surface: #ffffff;
+  --hm-board-shadow: 0 30px 60px -34px rgba(11, 18, 32, 0.42), 0 2px 8px rgba(11, 18, 32, 0.06);
+  --hm-cell-try: #d97706;
+  --hm-panel-green: #3ddc84; /* 结尾 CTA 终端与 hero 光标共用 */
 
   /* 排版、尺寸与缓动 */
   --hm-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Consolas,
@@ -146,7 +141,9 @@
   --hm-cb-danger: #fca5a5;
   --hm-cb-danger-bg: rgba(248, 113, 113, 0.1);
   --hm-cb-danger-line: rgba(248, 113, 113, 0.32);
-  --hm-panel-shadow: 0 36px 80px -40px rgba(0, 0, 0, 0.85), 0 2px 10px rgba(0, 0, 0, 0.4);
+  --hm-board-surface: #212127;
+  --hm-board-shadow: 0 30px 70px -36px rgba(0, 0, 0, 0.85), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --hm-cell-try: #fbbf24;
 }
 
 /* ============================================================
@@ -405,7 +402,8 @@
 }
 
 /* ============================================================
-   §5 评测机面板（HomeJudge）
+   §5 现场榜单卡片（HomeBoard）
+   —— 纸面记分牌：浅色卡片 + 彩色判题方块，与页面的纸张语言一致
    ============================================================ */
 
 /* 复位默认 hero 图片容器 */
@@ -432,14 +430,14 @@
   }
 }
 
-.hm-judge {
+.hm-board {
   position: relative;
-  width: min(100%, 452px);
+  width: min(100%, 462px);
   margin: 0 auto;
 }
 
-/* 面板背后的色雾 */
-.hm-judge__glow {
+/* 卡片背后的色雾 */
+.hm-board__glow {
   position: absolute;
   inset: 8% -8% -10% -12%;
   z-index: 0;
@@ -450,27 +448,99 @@
   filter: blur(26px);
 }
 
-/* —— 编辑器窗口 —— */
-.hm-editor {
+/* —— 卡片本体：纸面记分牌 —— */
+.hm-board__card {
   position: relative;
   z-index: 2;
-  margin: 0;
   border-radius: var(--hm-radius);
   overflow: hidden;
-  background: var(--hm-panel-bg);
-  border: 1px solid var(--hm-panel-line);
-  box-shadow: var(--hm-panel-shadow);
+  background: var(--hm-board-surface);
+  border: 1px solid var(--hm-line);
+  box-shadow: var(--hm-board-shadow);
 }
 
-.hm-editor__bar {
+.hm-board__bar {
   display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 13px 18px 12px;
+  border-bottom: 1px solid var(--hm-line);
+}
+
+.hm-board__title {
+  font-size: 0.98rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: var(--hm-ink);
+}
+
+.hm-board__sub {
+  font-family: var(--hm-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--hm-ink-3);
+}
+
+.hm-board__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  align-self: center;
+  padding: 3px 9px 3px 8px;
+  border-radius: 999px;
+  font-family: var(--hm-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  color: var(--hm-green);
+  background: var(--hm-green-soft);
+}
+
+.hm-board__live i {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hm-green);
+}
+
+.hm-board__live i::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--hm-green);
+  opacity: 0.5;
+  animation: hm-ping 2.6s var(--hm-ease-soft) infinite;
+}
+
+/* 表头列与数据行共用同一套网格 */
+.hm-board__cols,
+.hm-board__row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto 48px;
   align-items: center;
   gap: 12px;
-  padding: 11px 14px;
-  background: var(--hm-panel-bar);
-  border-bottom: 1px solid var(--hm-panel-line);
+  padding-left: 18px;
+  padding-right: 18px;
 }
 
+.hm-board__cols {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--hm-line);
+  font-family: var(--hm-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  color: var(--hm-ink-3);
+}
+
+.hm-board__cols span:nth-child(3),
+.hm-board__cols span:nth-child(4) {
+  text-align: right;
+}
+
+/* 窗口圆点：与结尾 CTA 的终端窗口共用 */
 .hm-dots {
   display: inline-flex;
   gap: 6px;
@@ -496,171 +566,157 @@
   background: #28c840;
 }
 
-.hm-editor__tab {
+/* —— 榜单数据行 —— */
+.hm-board__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hm-board__row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--hm-line);
+  font-size: 0.86rem;
+  animation: hm-row-in 0.5s var(--hm-ease) both;
+}
+
+.hm-board__row:last-child {
+  border-bottom: none;
+}
+
+/* 我们那一行：浅绿底 + 左侧绿条 + 加粗 */
+.hm-board__row.is-ours {
+  background: linear-gradient(90deg, var(--hm-green-soft), transparent 78%);
+  box-shadow: inset 2px 0 0 var(--hm-green);
+}
+
+.hm-board__rank {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 10px;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.06);
   font-family: var(--hm-mono);
-  font-size: 0.74rem;
-  color: #e6edf3;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--hm-ink-3);
+  background: var(--hm-tint);
 }
 
-.hm-editor__tab svg {
-  width: 13px;
-  height: 13px;
-  color: #7d8590;
+/* 前三名：金 / 银 / 铜 */
+.hm-board__rank.rk-1 {
+  color: #8a6116;
+  background: rgba(212, 160, 23, 0.16);
 }
 
-.hm-editor__lang {
-  margin-left: auto;
+.hm-board__rank.rk-2 {
+  color: #5d6673;
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.hm-board__rank.rk-3 {
+  color: #8a4f26;
+  background: rgba(176, 111, 58, 0.18);
+}
+
+/* 我们那行的名次徽章用签名绿（覆盖铜牌色） */
+.hm-board__row.is-ours .hm-board__rank {
+  color: var(--hm-green);
+  background: var(--hm-green-soft);
+}
+
+.hm-board__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--hm-ink-2);
+}
+
+.hm-board__row.is-ours .hm-board__name {
+  color: var(--hm-ink);
+  font-weight: 700;
+}
+
+/* 每题一颗的判题方块：AC 绿实心 / 没过 琥珀 / 未交 空心 */
+.hm-board__cells {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.hm-board__cells i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3.5px;
+}
+
+.cell-ac {
+  background: var(--hm-green);
+}
+
+.cell-try {
+  background: var(--hm-cell-try);
+}
+
+.cell-no {
+  border: 1px solid var(--hm-line-strong);
+  background: transparent;
+}
+
+.hm-board__penalty {
+  text-align: right;
+  font-family: var(--hm-mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--hm-ink-2);
+}
+
+.hm-board__row.is-ours .hm-board__penalty {
+  color: var(--hm-ink);
+}
+
+/* —— 卡脚（等宽小字） —— */
+.hm-board__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px;
+  border-top: 1px solid var(--hm-line);
+  background: var(--hm-tint);
   font-family: var(--hm-mono);
   font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  color: #7d8590;
+  color: var(--hm-ink-3);
 }
 
-.hm-editor__code {
-  margin: 0;
-  padding: 14px 0 16px;
-  font-family: var(--hm-mono);
-  font-size: 0.8rem;
-  line-height: 1.7;
-  color: var(--hm-panel-ink);
-  counter-reset: hm-line;
-  overflow: hidden;
-}
-
-.hm-editor__code code {
-  display: block;
-  font-family: inherit;
-}
-
-.hm-editor__line {
-  display: block;
-  padding: 0 18px 0 14px;
-  min-height: 1.7em;
-  white-space: pre;
-  counter-increment: hm-line;
-  animation: hm-line-in 0.5s var(--hm-ease) both;
-}
-
-/* 行号：inline-block 而非 flex 子项 —— 若把行走 flex 布局，每个语法着色
-   的 token span 都会变成 flex item，被 gap 撑开成「松散」的代码。 */
-.hm-editor__line::before {
-  content: counter(hm-line);
-  display: inline-block;
-  width: 2.2ch;
-  margin-right: 16px;
-  text-align: right;
-  color: #4a5568;
-}
-
-/* 语法着色（作用域限定在代码行内，避免全局类名冲突） */
-.hm-editor__line .t-c {
-  color: #7d8590;
-  font-style: italic;
-}
-
-.hm-editor__line .t-k {
-  color: #ff7b72;
-}
-
-.hm-editor__line .t-s {
-  color: #a5d6ff;
-}
-
-.hm-editor__line .t-n {
-  color: var(--hm-panel-ink);
-}
-
-.hm-editor__status {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 9px 16px;
-  background: var(--hm-panel-status-bg);
-  border-top: 1px solid var(--hm-panel-status-line);
-  font-family: var(--hm-mono);
-  font-size: 0.74rem;
-}
-
-.hm-editor__verdict {
+/* —— 浮动徽章：通过题数（悬在卡片正下方，不遮挡卡脚文字） —— */
+.hm-board__chip {
+  position: absolute;
+  left: -10px;
+  bottom: -44px;
+  z-index: 3;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--hm-panel-green);
-  animation: hm-pop 0.5s var(--hm-ease) both;
-  animation-delay: 1.05s;
-}
-
-.hm-editor__verdict svg {
-  width: 13px;
-  height: 13px;
-}
-
-.hm-editor__stat {
-  color: var(--hm-panel-ink-2);
-}
-
-.hm-editor__verdict + .hm-editor__stat {
-  margin-left: auto;
-}
-
-/* —— 终端窗口 —— */
-.hm-shell {
-  position: relative;
-  z-index: 2;
-  width: 88%;
-  margin: 12px 0 0;
-  padding: 11px 14px 12px;
-  border-radius: 12px;
-  background: var(--hm-panel-bg);
-  border: 1px solid var(--hm-panel-line);
-  box-shadow: var(--hm-panel-shadow);
-  font-family: var(--hm-mono);
-  font-size: 0.74rem;
-  line-height: 1.9;
-}
-
-.hm-shell__line {
-  display: flex;
-  align-items: center;
   gap: 8px;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  animation: hm-line-in 0.5s var(--hm-ease) both;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: var(--hm-board-surface);
+  border: 1px solid var(--hm-line);
+  box-shadow: var(--hm-board-shadow);
+  font-family: var(--hm-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--hm-ink);
+  animation: hm-pop 0.5s var(--hm-ease) both;
+  animation-delay: 0.95s;
 }
 
-.hm-shell__line:nth-child(1) {
-  animation-delay: 1.15s;
-}
-
-.hm-shell__line:nth-child(2) {
-  animation-delay: 1.3s;
-}
-
-.hm-shell__prompt {
-  color: var(--hm-panel-green);
-  font-weight: 700;
-}
-
-.hm-shell__cmd {
-  color: #c9d1d9;
-}
-
-.hm-shell__caret {
-  flex: none;
-  width: 7px;
-  height: 13px;
-  border-radius: 1px;
-  background: var(--hm-panel-green);
-  animation: hm-blink 1.15s step-end infinite;
+.hm-board__chip svg {
+  width: 14px;
+  height: 14px;
+  color: var(--hm-green);
 }
 
 /* ============================================================
@@ -1671,14 +1727,15 @@ html:has(.VPHome) .hm-progress {
   }
 }
 
-@keyframes hm-line-in {
+/* 榜单行错落浮现 */
+@keyframes hm-row-in {
   from {
     opacity: 0;
-    transform: translateX(-5px);
+    translate: 0 6px;
   }
   to {
     opacity: 1;
-    transform: none;
+    translate: 0 0;
   }
 }
 
@@ -1699,7 +1756,7 @@ html:has(.VPHome) .hm-progress {
 .VPHome .VPHero .main .tagline,
 .VPHome .VPHero .actions,
 .hm-paths,
-.hm-judge {
+.hm-board {
   animation: hm-rise 0.66s var(--hm-ease) both;
 }
 
@@ -1719,7 +1776,7 @@ html:has(.VPHome) .hm-progress {
   animation-delay: 0.24s;
 }
 
-.hm-judge {
+.hm-board {
   animation-delay: 0.12s;
 }
 
@@ -1770,7 +1827,7 @@ html:has(.VPHome) .hm-progress {
     margin-inline: auto;
   }
 
-  .hm-judge {
+  .hm-board {
     width: min(100%, 430px);
   }
 }
@@ -1831,13 +1888,14 @@ html:has(.VPHome) .hm-progress {
     gap: 6px 16px;
   }
 
-  .hm-shell {
+  .hm-board {
     width: 100%;
-    font-size: 0.7rem;
   }
 
-  .hm-editor__code {
-    font-size: 0.74rem;
+  /* 浮动徽章收一点，避免贴边溢出 */
+  .hm-board__chip {
+    left: 0;
+    bottom: -40px;
   }
 }
 
@@ -1856,15 +1914,14 @@ html:has(.VPHome) .hm-progress {
   .hm-status,
   .hm-status__dot::after,
   .hm-caret,
-  .hm-shell__caret,
-  .hm-editor__line,
-  .hm-editor__verdict,
-  .hm-shell__line,
+  .hm-board__live i::after,
+  .hm-board__row,
+  .hm-board__chip,
   .VPHome .VPHero .main .heading,
   .VPHome .VPHero .main .tagline,
   .VPHome .VPHero .actions,
   .hm-paths,
-  .hm-judge {
+  .hm-board {
     animation: none !important;
   }
 
