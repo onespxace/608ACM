@@ -2026,7 +2026,10 @@ html:has(.VPHome) .hm-progress {
   position: absolute;
   left: 50%;
   right: 50%;
-  bottom: -6px;
+  /* 注意：这里不能用 bottom —— 文字 span 被拉伸到整条导航的高度
+     （display:block + line-height = 导航高），bottom 会把线甩到导航栏外；
+     文字垂直居中时用「50% + 常量」正好贴在文字下方（任何导航高都成立）。 */
+  top: calc(50% + 11px);
   height: 2px;
   border-radius: 99px;
   background: var(--hm-green);

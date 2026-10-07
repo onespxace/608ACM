@@ -197,6 +197,45 @@ export default defineConfig({
     search: {
       provider: 'local',
       options: {
+        /**
+         * 中文友好的分词器（构建端建索引 / 浏览器端查询共用；该函数会被序列化、
+         * 在客户端用 `new Function` 还原，**必须自包含**、不引用外部变量）。
+         *
+         * 背景：VitePress 默认只按「空白 / 标点」切词，一整句无标点中文会变成
+         * 一个巨大词条，导致搜「入门」命中不到「算法竞赛入门指北」（前缀匹配
+         * 对不上）。策略：
+         *   · 连续汉字 → 相邻双字(bigram)，如「算法竞赛」→ 算法 / 法竞 / 竞赛，
+         *     搜「入门」「图论」「二分」可精确命中相邻字组合；
+         *   · 只保留 unigram 的例外：独立成段的单字（两侧是标点/空白）；
+         *     —— 若对所有字都发单字词条，「论」「分」这类高频字会把
+         *        「提问的智慧」顶到「图论」「二分」的搜索结果前面（实测过）。
+         *   · 英文 / 数字保持整词不变。
+         */
+        miniSearch: {
+          options: {
+            tokenize: (text: string) => {
+              const tokens: string[] = []
+              for (const segment of text.split(/[\n\r\p{Z}\p{P}]+/u)) {
+                if (!segment) continue
+                for (const part of segment.match(/[\p{Script=Han}]+|[^\p{Script=Han}]+/gu) || []) {
+                  if (/^\p{Script=Han}/u.test(part)) {
+                    const chars = Array.from(part)
+                    if (chars.length === 1) {
+                      tokens.push(chars[0])
+                    } else {
+                      for (let i = 0; i + 1 < chars.length; i++) {
+                        tokens.push(chars[i] + chars[i + 1])
+                      }
+                    }
+                  } else {
+                    tokens.push(part)
+                  }
+                }
+              }
+              return tokens
+            }
+          }
+        },
         translations: {
           button: {
             buttonText: '搜索文档',
