@@ -11,9 +11,9 @@
  *   §4  Hero 文案区   —— 状态胶囊 / 标题 / 按钮 / 快捷路径
  *   §5  判题机面板  —— 深色编辑器 + 终端（HomeJudge，代码逐字打出 → 提交 → AC）
  *   §6  分区骨架与标题
- *   §7  数据带
- *   §8  板块地图（bento）
- *   §9  进阶阶梯
+ *   §7  快速链接
+ *   §8  （已移除：原板块地图 bento）
+ *   §9  （已移除：原进阶阶梯）
  *   §10 终端式 CTA
  *   §11 内容页（阅读进度条 / 排版 / 自定义块 / 侧边栏…）
  *   §12 动效 / §13 响应式 / §14 降级 / §15 收尾
@@ -79,23 +79,23 @@
   --hm-cb-danger-line: rgba(220, 38, 38, 0.32);
 
   /* 判题机面板（HomeJudge）：深色编辑器 + 终端，两种模式共用；
-     代码配色取「Tokyo Night」一脉；鼠标交互色见文件末尾 §16 */
-  --hm-panel-bg: #1a1b26;
-  --hm-panel-bar: #1f2335;
-  --hm-panel-status: #1b1e30;
-  --hm-panel-line: rgba(255, 255, 255, 0.07);
+     代码配色取 VS Code Dark+ 一脉（蓝关键字 / 黄函数 / 浅绿数字，无紫）；
+     鼠标交互色见文件末尾 §16 */
+  --hm-panel-bg: #1e1e1e;
+  --hm-panel-bar: #252526;
+  --hm-panel-status: #1a1a1a;
+  --hm-panel-line: rgba(255, 255, 255, 0.09);
   --hm-panel-shadow: 0 36px 70px -36px rgba(3, 8, 20, 0.55), 0 2px 10px rgba(3, 8, 20, 0.14);
-  --hm-panel-ink: #c0caf5;
-  --hm-panel-ink-2: #565f89;
-  --hm-code-pre: #f7768e;
-  --hm-code-kw: #bb9af7;
-  --hm-code-fn: #7aa2f7;
-  --hm-code-str: #9ece6a;
-  --hm-code-num: #ff9e64;
-  --hm-code-op: #89ddff;
-  --hm-code-ink: #c0caf5;
+  --hm-panel-ink: #d4d4d4;
+  --hm-panel-ink-2: #8b8b8b;
+  --hm-code-pre: #569cd6;
+  --hm-code-kw: #569cd6;
+  --hm-code-fn: #dcdcaa;
+  --hm-code-str: #ce9178;
+  --hm-code-num: #b5cea8;
+  --hm-code-op: #d4d4d4;
+  --hm-code-ink: #d4d4d4;
   --hm-cursor-line: rgba(10, 133, 74, 0.7);
-  --hm-cursor-fill: rgba(10, 133, 74, 0.08);
   --hm-spot: rgba(10, 133, 74, 0.13);
   --hm-panel-green: #3ddc84; /* 结尾 CTA 终端与 hero 光标共用 */
 
@@ -158,7 +158,6 @@
   --hm-cb-danger-line: rgba(248, 113, 113, 0.32);
   /* 鼠标交互色（暗色下提亮） */
   --hm-cursor-line: rgba(61, 220, 132, 0.75);
-  --hm-cursor-fill: rgba(61, 220, 132, 0.1);
   --hm-spot: rgba(61, 220, 132, 0.12);
 }
 
@@ -492,7 +491,7 @@
   gap: 7px;
   padding: 5px 10px;
   border-radius: 7px;
-  background: rgba(122, 162, 247, 0.12);
+  background: rgba(86, 156, 214, 0.16);
   font-family: var(--hm-mono);
   font-size: 0.74rem;
   color: var(--hm-code-ink);
@@ -504,24 +503,47 @@
   color: var(--hm-code-fn);
 }
 
-.hm-editor__lang {
+/* 三段算法的进度点（当前段点亮） */
+.hm-editor__algos {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   margin-left: auto;
+}
+
+.hm-editor__algos i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(240, 246, 252, 0.18);
+  transition: background-color 0.25s ease, scale 0.25s ease;
+}
+
+.hm-editor__algos i.is-on {
+  background: var(--hm-panel-green);
+  scale: 1.25;
+}
+
+.hm-editor__lang {
   font-family: var(--hm-mono);
   font-size: 0.68rem;
   letter-spacing: 0.1em;
   color: var(--hm-panel-ink-2);
 }
 
-/* —— 代码区 —— */
+/* —— 代码区：固定视口的「取景框」，内容随打字缓缓下滚 —— */
 .hm-editor__code {
   margin: 0;
-  padding: 14px 0 16px;
+  padding: 0;
+  height: calc(1.75em * 8.5 + 20px);
   font-family: var(--hm-mono);
   font-size: 0.8rem;
   line-height: 1.75;
   color: var(--hm-code-ink);
   counter-reset: hm-line;
   overflow: hidden;
+  mask-image: linear-gradient(180deg, #000 86%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 86%, transparent 100%);
 }
 
 .hm-editor__code code {
@@ -529,9 +551,19 @@
   font-family: inherit;
 }
 
-/* 代码行：flex 两列（行号 + 内容），行号由计数器生成。
-   注意：着色 token 必须包在单一内容节点（.hm-editor__text / .hm-type）里，
-   不能把 token span 直接铺成 flex 子项，否则会被撑散。 */
+.hm-editor__scroll {
+  display: block;
+  padding: 14px 0 16px;
+  transition: transform 0.55s cubic-bezier(0.3, 0.7, 0.4, 1), opacity 0.35s ease;
+  will-change: transform;
+}
+
+/* 切段时整体淡出（归位动作在禁用过渡的同一帧内完成） */
+.hm-editor[data-phase='switch'] .hm-editor__scroll {
+  opacity: 0;
+}
+
+/* 代码行：flex 行号 + 内容；着色片段保持 flex: none（行内无 gap，横排即连成整行） */
 .hm-editor__line {
   display: flex;
   align-items: baseline;
@@ -539,7 +571,11 @@
   min-height: 1.75em;
   white-space: pre;
   counter-increment: hm-line;
-  animation: hm-line-in 0.5s var(--hm-ease) both;
+}
+
+.hm-editor__line > span,
+.hm-editor__line > i {
+  flex: none;
 }
 
 .hm-editor__line::before {
@@ -548,33 +584,21 @@
   width: 2.2ch;
   margin-right: 16px;
   text-align: right;
-  color: #3b4261;
+  color: #858585;
 }
 
-.hm-editor__text {
-  white-space: pre;
-}
-
-/* 逐字打出的行：宽度 0 → nch（steps 走字），动画参数由组件内联给出；
-   基础宽度 auto，保证 reduced-motion 下直接完整可见 */
-.hm-type {
-  display: block;
-  overflow: hidden;
-  white-space: pre;
-  width: auto;
-}
-
-.hm-type__caret {
+/* 打字光标：逐字打出时在行尾常亮 */
+.hm-editor__caret {
   flex: none;
   width: 7px;
   height: 1.02em;
-  margin-left: 2px;
+  margin-left: 1px;
   border-radius: 1px;
-  background: var(--hm-code-fn);
-  opacity: 0;
+  background: #aeafad;
+  animation: hm-blink 1.05s step-end infinite;
 }
 
-/* —— 语法着色（Tokyo Night 一脉） —— */
+/* —— 语法着色（GitHub Dark 一脉） —— */
 .hm-editor__code .t-pre {
   color: var(--hm-code-pre);
 }
@@ -619,10 +643,16 @@
   align-items: center;
   gap: 7px;
   white-space: nowrap;
+  transition: opacity 0.22s ease, transform 0.3s var(--hm-ease);
 }
 
 .hm-editor__v0 {
   color: var(--hm-panel-ink-2);
+  opacity: 0;
+}
+
+.hm-editor__v0.is-on {
+  opacity: 1;
 }
 
 .hm-editor__v1,
@@ -631,7 +661,19 @@
   left: 16px;
   top: 50%;
   translate: 0 -50%;
+  transform-origin: left center;
   opacity: 0;
+}
+
+.hm-editor__v1.is-on,
+.hm-editor__v2.is-on {
+  opacity: 1;
+}
+
+/* 略微延迟出现，避免与上一段文案短暂重叠 */
+.hm-editor__v1,
+.hm-editor__v2 {
+  transition-delay: 0.08s;
 }
 
 .hm-editor__v1 {
@@ -641,6 +683,11 @@
 .hm-editor__v2 {
   color: var(--hm-panel-green);
   font-weight: 700;
+  transform: scale(0.94);
+}
+
+.hm-editor__v2.is-on {
+  transform: none;
 }
 
 .hm-editor__v2 svg {
@@ -681,9 +728,21 @@
   letter-spacing: 0.02em;
   box-shadow: 0 6px 16px -8px rgba(61, 220, 132, 0.6);
   pointer-events: none;
+  transition: opacity 0.35s ease, box-shadow 0.35s ease;
 }
 
-/* —— 点击涟漪（在按钮中心扩散） —— */
+/* 点击瞬间的回弹（判定开始时挂上） */
+.hm-editor__submit.is-press {
+  animation: hm-press 0.34s var(--hm-ease) both;
+}
+
+/* 判定完成后转「已提交」形态 */
+.hm-editor__submit.is-done {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+/* —— 点击涟漪（在按钮中心扩散；判定阶段短暂存在） —— */
 .hm-editor__ripple {
   position: absolute;
   right: 30px;
@@ -692,11 +751,11 @@
   height: 16px;
   border-radius: 50%;
   border: 2px solid var(--hm-panel-green);
-  opacity: 0;
   pointer-events: none;
+  animation: hm-ripple-out 0.65s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
-/* —— 鼠标指针（滑入 → 点击 → 离场；位移由 hm-cursor-ride 驱动） —— */
+/* —— 鼠标指针（滑入 → 点击 → 判定后飘走） —— */
 .hm-editor__cursor {
   position: absolute;
   right: 22px;
@@ -704,9 +763,13 @@
   z-index: 4;
   width: 16px;
   height: 22px;
-  opacity: 0;
   transform-origin: 0 0;
   pointer-events: none;
+  animation: hm-cursor-in 0.85s cubic-bezier(0.25, 0.9, 0.3, 1) both;
+}
+
+.hm-editor__cursor.is-bye {
+  animation: hm-cursor-bye 0.5s ease both;
 }
 
 .hm-editor__cursor svg {
@@ -838,8 +901,6 @@
 
 /* 中文标题避免「孤字行」；不支持的浏览器直接忽略 */
 .hm-head__title,
-.hm-card__title,
-.hm-step__title,
 .hm-cta__title {
   text-wrap: pretty;
 }
@@ -852,348 +913,122 @@
 }
 
 /* ============================================================
-   §7 数据带
+   §7 快速链接
+   —— 参考山东理工 ACM 官网与 xcpc.link 的资源导航体例：
+      三组（题库训练 / 工具资料 / 榜单赛讯），名 + 一句话说明；
+      留白优先，悬停只做「名字变绿 + 箭头右上滑出」的轻反馈
    ============================================================ */
-.hm-stats {
+.hm-links {
   padding-top: 6px;
 }
 
-.hm-stats__row {
+.hm-links__grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--hm-line);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 44px 56px;
 }
 
-.hm-stats__item {
-  padding: 26px 26px 28px;
-  border-bottom: 1px solid var(--hm-line);
-}
-
-.hm-stats__item + .hm-stats__item {
-  border-left: 1px solid var(--hm-line);
-}
-
-.hm-stats__tag {
-  margin: 0;
-  font-family: var(--hm-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  color: var(--hm-ink-3);
-}
-
-.hm-stats__value {
-  margin: 10px 0 0;
-  font-family: var(--hm-mono);
-  font-size: clamp(1.7rem, 2.6vw, 2.3rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.05em;
-  font-variant-numeric: tabular-nums;
-  color: var(--hm-ink);
-}
-
-.hm-stats__value span {
-  margin-left: 2px;
-  font-size: 0.62em;
-  color: var(--hm-green);
-}
-
-.hm-stats__label {
-  margin: 9px 0 0;
-  font-size: 0.86rem;
-  color: var(--hm-ink-2);
-}
-
-/* ============================================================
-   §8 板块地图（bento）
-   ============================================================ */
-.hm-bento {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.hm-card {
-  grid-column: span 2;
-  position: relative;
+.hm-links__tag {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 24px;
-  border-radius: var(--hm-radius);
-  background: var(--hm-tint);
-  border: 1px solid var(--hm-line);
-  color: var(--hm-ink);
-  text-decoration: none;
-  transition: transform 0.38s var(--hm-ease), border-color 0.3s ease,
-    background-color 0.3s ease, box-shadow 0.38s var(--hm-ease);
-}
-
-.hm-card--lg {
-  grid-column: span 3;
-  padding: 28px 26px 26px;
-}
-
-.hm-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--hm-line-strong);
-  background: var(--hm-tint-hover);
-  box-shadow: var(--hm-card-hover-shadow);
-}
-
-.hm-card:focus-visible {
-  outline: 2px solid var(--hm-green);
-  outline-offset: 3px;
-}
-
-.hm-card__top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: baseline;
   gap: 10px;
-}
-
-.hm-card__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 11px;
-  background: var(--hm-chip-bg);
-  border: 1px solid var(--hm-line);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-  color: var(--hm-ink-2);
-  transition: color 0.3s ease, border-color 0.3s ease;
-}
-
-.dark .hm-card__icon {
-  box-shadow: none;
-}
-
-.hm-card__icon svg {
-  width: 19px;
-  height: 19px;
-}
-
-.hm-card:hover .hm-card__icon {
-  color: var(--hm-green);
-  border-color: var(--hm-green-soft);
-}
-
-.hm-card__no {
-  font-family: var(--hm-mono);
-  font-size: 0.74rem;
-  letter-spacing: 0.1em;
-  color: var(--hm-ink-3);
-  transition: color 0.3s ease;
-}
-
-.hm-card:hover .hm-card__no {
-  color: var(--hm-green);
-}
-
-.hm-card__title {
-  margin: 2px 0 0;
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.5;
-  letter-spacing: -0.012em;
-  color: var(--hm-ink);
-}
-
-.hm-card--lg .hm-card__title {
-  font-size: 1.13rem;
-}
-
-.hm-card__desc {
-  flex: 1;
-  margin: 0;
-  font-size: 0.87rem;
-  line-height: 1.8;
-  color: var(--hm-ink-2);
-}
-
-.hm-card__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-
-.hm-card__tag {
-  padding: 3px 9px;
-  border-radius: 6px;
-  font-family: var(--hm-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
-  color: var(--hm-ink-2);
-  background: var(--hm-chip-bg);
-  border: 1px solid var(--hm-line);
-}
-
-.hm-card__more {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--hm-ink);
-}
-
-.hm-card__more svg {
-  width: 15px;
-  height: 15px;
-  transition: transform 0.3s var(--hm-ease);
-}
-
-.hm-card:hover .hm-card__more {
-  color: var(--hm-green);
-}
-
-.hm-card:hover .hm-card__more svg {
-  transform: translateX(4px);
-}
-
-/* ============================================================
-   §9 进阶阶梯（题目列表隐喻）
-   ============================================================ */
-.hm-ladder {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--hm-line);
-}
-
-.hm-step {
+  margin: 0 0 8px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--hm-line);
-}
-
-/* 四档难度色（在 li 上定义，供题号与难度章继承） */
-.hm-step--g1 {
-  --tone: var(--hm-rank-1);
-  --tone-soft: var(--hm-rank-1-soft);
-}
-
-.hm-step--g2 {
-  --tone: var(--hm-rank-2);
-  --tone-soft: var(--hm-rank-2-soft);
-}
-
-.hm-step--g3 {
-  --tone: var(--hm-rank-3);
-  --tone-soft: var(--hm-rank-3-soft);
-}
-
-.hm-step--g4 {
-  --tone: var(--hm-rank-4);
-  --tone-soft: var(--hm-rank-4-soft);
-}
-
-.hm-step__link {
-  display: grid;
-  grid-template-columns: 54px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 22px;
-  padding: 20px 16px;
-  border-radius: 12px;
-  color: inherit;
-  text-decoration: none;
-  transition: background-color 0.26s ease;
-}
-
-.hm-step__link:hover {
-  background: var(--hm-tint);
-}
-
-.hm-step__key {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
-  font-family: var(--hm-mono);
-  font-size: 1.02rem;
-  font-weight: 700;
-  color: var(--tone);
-  background: var(--tone-soft);
-}
-
-.hm-step__main {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-
-.hm-step__title {
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--hm-ink);
 }
 
-.hm-step__desc {
-  font-size: 0.87rem;
-  line-height: 1.75;
-  color: var(--hm-ink-2);
+.hm-links__no {
+  font-family: var(--hm-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--hm-green);
 }
 
-.hm-step__meta {
+.hm-links__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hm-links__list li + li {
+  border-top: 1px solid var(--hm-line);
+}
+
+.hm-links__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 2px;
+  text-decoration: none;
+}
+
+/* 站点图标：本地 favicon 放在浅色小方片里 */
+.hm-links__logo {
+  flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 16px;
-}
-
-.hm-step__chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 7px;
-  padding: 5px 11px;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin-top: 1px;
   border-radius: 8px;
-  font-family: var(--hm-mono);
-  font-size: 0.72rem;
-  white-space: nowrap;
-  color: var(--tone);
-  background: var(--tone-soft);
+  background: var(--hm-chip-bg);
+  border: 1px solid var(--hm-line);
+  overflow: hidden;
 }
 
-.hm-step__chip b {
-  font-weight: 700;
-  letter-spacing: 0.02em;
+.hm-links__logo img {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
 }
 
-.hm-step__chip em {
-  font-style: normal;
-  opacity: 0.78;
+.hm-links__body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
 }
 
-.hm-step__hint {
-  font-size: 0.82rem;
-  font-weight: 600;
-  white-space: nowrap;
-  color: var(--hm-ink-2);
-  transition: color 0.26s ease;
+.hm-links__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.94rem;
+  font-weight: 650;
+  color: var(--hm-ink);
+  transition: color 0.22s ease;
 }
 
-.hm-step__arrow {
-  width: 16px;
-  height: 16px;
+.hm-links__name svg {
+  width: 13px;
+  height: 13px;
   color: var(--hm-ink-3);
-  transition: transform 0.3s var(--hm-ease), color 0.26s ease;
+  transition: transform 0.28s var(--hm-ease), color 0.22s ease;
 }
 
-.hm-step__link:hover .hm-step__hint {
+.hm-links__desc {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--hm-ink-2);
+}
+
+.hm-links__item:hover .hm-links__name {
   color: var(--hm-green);
 }
 
-.hm-step__link:hover .hm-step__arrow {
+.hm-links__item:hover .hm-links__name svg {
   color: var(--hm-green);
-  transform: translateX(4px);
+  transform: translate(2px, -2px);
 }
+
+/* （原 §8 板块地图 bento 样式已随八个入口一并移除） */
+
+/* （原 §9 进阶阶梯样式已随四级阶梯一并移除） */
 
 /* ============================================================
    §10 终端式 CTA
@@ -1808,46 +1643,29 @@ html:has(.VPHome) .hm-progress {
   }
 }
 
-/* 逐字打出：宽度 0 → nch（steps 节奏由组件内联在 animation 里） */
-@keyframes hm-type {
+/* 鼠标指针：自右下滑入，停在按钮上 */
+@keyframes hm-cursor-in {
   from {
-    width: 0;
+    transform: translate(88px, 46px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
   }
   to {
-    width: calc(var(--chars) * 1ch + 1px);
+    transform: translate(0, 0);
+    opacity: 1;
   }
 }
 
-/* 鼠标指针：滑入（0→30%）→ 悬停 → 按下回弹（38%±）→ 离场（89%→100%） */
-@keyframes hm-cursor-ride {
-  0% {
-    transform: translate(88px, 46px);
-    opacity: 0;
-    animation-timing-function: cubic-bezier(0.25, 0.9, 0.3, 1);
-  }
-  6% {
-    opacity: 1;
-  }
-  30% {
-    transform: translate(0, 0);
-  }
-  38% {
-    transform: translate(0, 0);
-    animation-timing-function: ease-in-out;
-  }
-  40.5% {
-    transform: translate(1px, 1px) scale(0.86);
-  }
-  45% {
-    transform: translate(0, 0) scale(1);
-  }
-  89% {
+/* 鼠标指针：判定完成后飘走 */
+@keyframes hm-cursor-bye {
+  from {
     transform: translate(0, 0);
     opacity: 1;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
   }
-  100% {
-    transform: translate(34px, 40px);
+  to {
+    transform: translate(30px, 34px);
     opacity: 0;
   }
 }
@@ -1865,14 +1683,6 @@ html:has(.VPHome) .hm-progress {
   }
 }
 
-/* 提交按钮：判定完成后转「已提交」形态 */
-@keyframes hm-btn-done {
-  to {
-    opacity: 0.55;
-    box-shadow: none;
-  }
-}
-
 /* 点击涟漪 */
 @keyframes hm-ripple-out {
   from {
@@ -1882,54 +1692,6 @@ html:has(.VPHome) .hm-progress {
   to {
     transform: scale(2.4);
     opacity: 0;
-  }
-}
-
-/* 判定区：待提交淡出 */
-@keyframes hm-verdict-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-/* 判定区：评测中淡入 → 停留 → 淡出 */
-@keyframes hm-verdict-judging {
-  0% {
-    opacity: 0;
-  }
-  9% {
-    opacity: 1;
-  }
-  78% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-/* 判定区：Accepted 弹入 */
-@keyframes hm-accepted-in {
-  from {
-    opacity: 0;
-    transform: scale(0.86);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* 编辑器光标：淡入，随后交给 hm-blink 闪烁 */
-@keyframes hm-caret-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 
@@ -1985,31 +1747,9 @@ html:has(.VPHome) .hm-progress {
    §13 响应式
    ============================================================ */
 @media (max-width: 1000px) {
-  .hm-bento {
+  .hm-links__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .hm-card,
-  .hm-card--lg {
-    grid-column: span 1;
-  }
-
-  .hm-card--lg {
-    grid-column: span 2;
-  }
-}
-
-@media (max-width: 900px) {
-  .hm-stats__row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .hm-stats__item + .hm-stats__item {
-    border-left: none;
-  }
-
-  .hm-stats__item:nth-child(even) {
-    border-left: 1px solid var(--hm-line);
+    gap: 38px 44px;
   }
 }
 
@@ -2033,35 +1773,14 @@ html:has(.VPHome) .hm-progress {
   }
 }
 
-@media (max-width: 760px) {
-  .hm-step__link {
-    grid-template-columns: 42px minmax(0, 1fr);
-    gap: 8px 16px;
-    padding: 18px 12px;
-  }
-
-  .hm-step__main {
-    grid-column: 2;
-  }
-
-  .hm-step__meta {
-    grid-column: 2;
-    justify-content: flex-start;
-    gap: 12px;
-  }
-}
-
 @media (max-width: 640px) {
   :root {
     --hm-gutter: 20px;
   }
 
-  .hm-bento {
+  .hm-links__grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .hm-card--lg {
-    grid-column: span 1;
+    gap: 34px;
   }
 
   .hm-section + .hm-section {
@@ -2110,9 +1829,7 @@ html:has(.VPHome) .hm-progress {
   .hm-status__dot::after,
   .hm-caret,
   .hm-judge,
-  .hm-editor__line,
-  .hm-type,
-  .hm-type__caret,
+  .hm-editor__caret,
   .hm-editor__cursor,
   .hm-editor__ripple,
   .hm-editor__submit,
@@ -2144,11 +1861,14 @@ html:has(.VPHome) .hm-progress {
     display: none;
   }
 
-  .hm-card,
-  .hm-card__icon,
-  .hm-card__more svg,
-  .hm-step__link,
-  .hm-step__arrow,
+  .hm-links__item,
+  .hm-links__name,
+  .hm-links__name svg,
+  .hm-editor__scroll,
+  .hm-editor__v0,
+  .hm-editor__v1,
+  .hm-editor__v2,
+  .hm-editor__submit,
   .hm-btn,
   .VPHome .VPHero .actions .VPButton,
   .hm-paths__path,
@@ -2156,8 +1876,6 @@ html:has(.VPHome) .hm-progress {
     transition: none !important;
   }
 
-  .hm-card:hover,
-  .hm-step__link:hover,
   .hm-btn:hover,
   .VPHome .VPHero .actions .VPButton:hover {
     transform: none;
@@ -2178,53 +1896,10 @@ html:has(.VPHome) .hm-progress {
 
 /* ============================================================
    §16 全局鼠标交互（2026-10-07）
-   —— 光标跟随环 / 点击涟漪 / 卡片聚光灯 / 导航下划线 / 按钮按压。
+   —— 点击涟漪 / 卡片聚光灯 / 导航下划线 / 按钮按压。
       仅对精确指针设备启用（Layout.vue 判定 hover + pointer:fine），
       并尊重 prefers-reduced-motion（见本节末尾覆盖）。
    ============================================================ */
-
-/* 光标跟随环（元素由 Layout.vue 注入，位移由 JS 缓动跟随驱动）
-   结构：0 尺寸定位点（JS 只改它的 translate）+ ::before 画环。
-   —— 放大必须作用在伪元素上：若直接 scale 定位点自身，位移会被一起放大，
-      环就会漂离指针（scale 与 translate 的合成顺序所致）。 */
-.hm-cursor {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 9999;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  will-change: transform;
-}
-
-.hm-cursor::before {
-  content: '';
-  position: absolute;
-  left: -13px;
-  top: -13px;
-  width: 26px;
-  height: 26px;
-  border: 1.5px solid var(--hm-cursor-line);
-  border-radius: 50%;
-  background: transparent;
-  transition: scale 0.22s var(--hm-ease), background-color 0.22s ease;
-}
-
-.hm-cursor.is-on {
-  opacity: 1;
-}
-
-.hm-cursor.is-active::before {
-  scale: 1.55;
-  background: var(--hm-cursor-fill);
-}
-
-.hm-cursor.is-down::before {
-  scale: 0.82;
-}
 
 /* 点击涟漪（JS 在指针位置生成，动画结束自动移除） */
 .hm-fx-ripple {
@@ -2306,7 +1981,6 @@ html:has(.VPHome) .hm-progress {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hm-cursor,
   .hm-fx-ripple {
     display: none;
   }

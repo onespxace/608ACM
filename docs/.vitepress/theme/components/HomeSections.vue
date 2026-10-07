@@ -3,272 +3,123 @@ import { withBase } from 'vitepress'
 
 /**
  * 首页主体分区（注入 `home-features-after` 插槽，SSG 阶段即渲染为静态 HTML）：
- *   1. hm-stats  数据带        —— 四个可核对的数字，像记分板一样横排
- *   2. hm-bento  板块地图      —— 八个入口，6 列网格（两张主卡各占 3 列）
- *   3. hm-ladder 进阶阶梯      —— 四道「题」A→D，带难度分档色（借鉴 CF rating 配色）
- *   4. hm-cta    终端式收尾    —— 深色终端窗口 + 主行动点
+ *   1. hm-links  快速链接 —— 参考山东理工 ACM 官网「带图标 + 一句话说明」的体例，
+ *      结合 xcpc.link（AWESOME XCPC）的资源分类，整理出三组常用站点：
+ *      题库训练 / 工具资料 / 榜单赛事资讯，共 30 条；图标为本地打包的 favicon
+ *      （docs/public/icons/，随仓库分发，不依赖外部图床）；
+ *   2. hm-cta    终端式收尾 —— 深色终端窗口 + 主行动点。
  *
  * 约定：
- *   · 图标全部是内联 <path>，不用 v-html；
- *   · 只出结构，颜色/间距走 style.css 的 --hm-* 令牌；
- *   · 动效仅限首屏入场与悬停，可被 prefers-reduced-motion 关闭。
+ *   · 外链一律 target="_blank" + rel="noopener noreferrer"；
+ *   · 只出结构，颜色 / 间距走 style.css 的 --hm-* 令牌；
+ *   · 动效仅限悬停（聚光灯 / 箭头滑出），可被 prefers-reduced-motion 关闭。
  */
 
-const stats = [
-  { tag: 'MODULES', value: '8', unit: '', label: '核心板块' },
-  { tag: 'PLATFORMS', value: '14', unit: '+', label: '训练与赛事平台' },
-  { tag: 'STAGES', value: '4', unit: '', label: '进阶阶段' },
-  { tag: 'PROBLEMS', value: '200', unit: '', label: '牛客精选题单' }
-]
-
-interface SiteCard {
-  title: string
+interface QuickLink {
+  name: string
+  url: string
+  /** 一句话说明（参考 SDUT ACM 官网的链接描述体例） */
   desc: string
-  link: string
-  more: string
-  /** 主卡：占 3 列，展示标签行 */
-  featured?: boolean
-  tags?: string[]
-  /** 图标由纯 <path> 组成，避免 v-html */
-  paths: string[]
+  /** 本地图标文件名（docs/public/icons/） */
+  icon: string
 }
 
-const sites: SiteCard[] = [
-  {
-    title: '算法竞赛入门指北',
-    desc: '从认识比赛到写出第一道 AC：刷题平台怎么选、学习资源怎么用、IDE 怎么配、STL 怎么查，一册讲完。',
-    link: '/guide/',
-    more: '从第一页读起',
-    featured: true,
-    tags: ['#比赛扫盲', '#刷题网站', '#编程环境', '#STL 速查'],
-    paths: [
-      'M12 7v14',
-      'M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z'
-    ]
-  },
-  {
-    title: 'ICPC 国际大学生程序设计竞赛',
-    desc: '含金量最高的大学生算法赛事。网络赛、区域赛到 EC Final 的晋级链路与名额规则，附最新校内数据。',
-    link: '/contests/icpc',
-    more: '打开赛事说明',
-    featured: true,
-    tags: ['#网络赛', '#区域赛', '#EC Final'],
-    paths: [
-      'M6 9H4.5a2.5 2.5 0 0 1 0-5H6',
-      'M18 9h1.5a2.5 2.5 0 0 0 0-5H18',
-      'M4 22h16',
-      'M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22',
-      'M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22',
-      'M18 2H6v7a6 6 0 0 0 12 0V2Z'
-    ]
-  },
-  {
-    title: 'CCPC 中国大学生程序设计竞赛',
-    desc: '国内最高规格的算法赛事之一：名额分配、参赛费用、女队与外卡政策，逐条讲清楚。',
-    link: '/contests/ccpc',
-    more: '查看 CCPC',
-    paths: [
-      'M18 8a6 6 0 1 1-12 0 6 6 0 0 1 12 0',
-      'M15.477 12.89 17 22l-5-3-5 3 1.523-9.11'
-    ]
-  },
-  {
-    title: '牛客暑期多校训练营',
-    desc: '200 道精选题单 + 10 场多人联考 + 赛后讲题，暑假合练、备战下半年 XCPC 的首选。',
-    link: '/contests/nowcoder',
-    more: '查看训练营',
-    paths: [
-      'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2',
-      'M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
-      'M22 21v-2a4 4 0 0 0-3-3.87',
-      'M16 3.13a4 4 0 0 1 0 7.75'
-    ]
-  },
-  {
-    title: '算竞前中期指南 & 训练建议',
-    desc: '资深选手的方法论：思维怎么练、科技怎么点、训练节奏怎么稳，CF 到 XCPC 都适用。',
-    link: '/guide/satsky-guide',
-    more: '查看指南',
-    paths: [
-      'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',
-      'M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0',
-      'M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0'
-    ]
-  },
-  {
-    title: '常用网站导航',
-    desc: '导航站、在线评测、排行榜、赛事官方——所有会用到的 XCPC 站点，一页收齐。',
-    link: '/contests/acm-websites',
-    more: '浏览导航',
-    paths: [
-      'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',
-      'M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88Z'
-    ]
-  },
-  {
-    title: '常用资源',
-    desc: '官方规则、费用与名额文件等一手资料，需要核对时随手可查。',
-    link: '/contests/resources',
-    more: '浏览资源',
-    paths: [
-      'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71',
-      'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'
-    ]
-  },
-  {
-    title: '工具与环境',
-    desc: '编辑器、插件与笔记工具推荐，把写题环境调到顺手，训练效率立竿见影。',
-    link: '/guide/#编程环境',
-    more: '了解详情',
-    paths: ['M4 17 10 11 4 5', 'M12 19h8']
-  }
-]
-
-interface LadderStep {
-  /** 以「题号」呈现：A → D */
-  key: string
+interface LinkGroup {
+  /** 组名 */
   title: string
-  desc: string
-  rating: string
-  grade: string
-  /** 难度分档色档位 g1–g4（灰 / 青 / 蓝 / 红） */
-  tone: 'g1' | 'g2' | 'g3' | 'g4'
-  link: string
-  linkText: string
+  links: QuickLink[]
 }
 
-const ladder: LadderStep[] = [
+/** 三组链接：整理自山东理工 ACM 官网与 xcpc.link 的资源清单 */
+const groups: LinkGroup[] = [
   {
-    key: 'A',
-    title: '打牢语言基础',
-    desc: '掌握 C++ 基础语法与常用 STL，在洛谷 / 蓝桥云课独立写出第一道 AC。',
-    rating: 'R800',
-    grade: '入门',
-    tone: 'g1',
-    link: '/guide/',
-    linkText: '看入门指北'
+    title: '题库 · 训练平台',
+    links: [
+      { name: 'Codeforces', url: 'https://codeforces.com', desc: '全球最大算法竞赛平台，周赛与 Rating 体系', icon: 'codeforces.png' },
+      { name: 'AtCoder', url: 'https://atcoder.jp', desc: '日本最大的算法竞技网站，ABC / ARC 系列', icon: 'atcoder.png' },
+      { name: '洛谷', url: 'https://www.luogu.com.cn', desc: '国内活跃的中文题库与社区', icon: 'luogu.ico' },
+      { name: '牛客竞赛', url: 'https://ac.nowcoder.com', desc: '国内赛事、训练营与题解讨论', icon: 'nowcoder.ico' },
+      { name: 'QOJ', url: 'https://qoj.ac', desc: 'XCPC 近年真题复现与练题', icon: 'qoj.svg' },
+      { name: 'VJudge', url: 'https://vjudge.net', desc: '多 OJ 题目聚合与虚拟评测（含国内镜像）', icon: 'vjudge.ico' },
+      { name: 'AcWing', url: 'https://www.acwing.com', desc: '算法竞赛学习平台与周赛', icon: 'acwing.ico' },
+      { name: 'UOJ', url: 'https://uoj.ac', desc: '国内开源评测系统社区', icon: 'uoj.ico' },
+      { name: 'HDU OJ', url: 'https://acm.hdu.edu.cn', desc: '老牌杭电在线评测系统', icon: 'hdu.ico' },
+      { name: '代码源', url: 'https://oj.daimayuan.top', desc: '新手友好的练习题库', icon: 'daimayuan.ico' }
+    ]
   },
   {
-    key: 'B',
-    title: '系统刷题训练',
-    desc: 'Codeforces、AtCoder、牛客周赛轮转上分，把思维速度与代码量一起堆起来。',
-    rating: 'R1400',
-    grade: '进阶',
-    tone: 'g2',
-    link: '/guide/satsky-guide',
-    linkText: '看训练建议'
+    title: '工具 · 学习资料',
+    links: [
+      { name: 'OI Wiki', url: 'https://oi-wiki.org', desc: '中文算法竞赛知识百科', icon: 'oiwiki.ico' },
+      { name: 'cp-algorithms', url: 'https://cp-algorithms.com', desc: '英文算法教程经典站点', icon: 'cpalgo.ico' },
+      { name: 'KACTL', url: 'https://github.com/kth-competitive-programming/kactl', desc: '顶尖队伍的 ICPC 模板库', icon: 'github.svg' },
+      { name: 'AtCoder Library', url: 'https://github.com/atcoder/ac-library', desc: '官方算法库，带文档与练习题', icon: 'github.svg' },
+      { name: 'VisuAlgo', url: 'https://visualgo.net/zh', desc: '用动画把数据结构与算法可视化', icon: 'visualgo.png' },
+      { name: '图论画图', url: 'https://csacademy.com/app/graph_editor/', desc: 'CS Academy Graph Editor，画图论题的神器', icon: 'csacademy.png' },
+      { name: 'Desmos', url: 'https://www.desmos.com/calculator?lang=zh-CN', desc: '函数图像计算器', icon: 'desmos.ico' },
+      { name: 'OEIS', url: 'https://oeis.org', desc: '整数数列大全，数论 / 组合常备', icon: 'oeis.ico' },
+      { name: 'Diffchecker', url: 'https://www.diffchecker.com', desc: '代码 / 文本差异比对，对拍好帮手', icon: 'diffchecker.ico' },
+      { name: 'Paste then AC', url: 'https://paste.then.ac', desc: '适合算法竞赛的自由剪贴板', icon: 'pastethenac.ico' }
+    ]
   },
   {
-    key: 'C',
-    title: '拿下入门奖牌',
-    desc: '蓝桥杯、团体程序设计天梯赛、河南省赛——用一块奖牌验证阶段成果。',
-    rating: 'R1800',
-    grade: '夺牌',
-    tone: 'g3',
-    link: '/contests/acm-websites',
-    linkText: '查赛事与榜单'
-  },
-  {
-    key: 'D',
-    title: '冲击 XCPC',
-    desc: '通过选拔进入工作室，组队征战 ICPC / CCPC 网络赛与区域赛，向更高的奖牌发起挑战。',
-    rating: 'R2400',
-    grade: '冲刺',
-    tone: 'g4',
-    link: '/contests/icpc',
-    linkText: '看 ICPC 说明'
+    title: '榜单 · 赛事资讯',
+    links: [
+      { name: 'XCPCIO', url: 'https://board.xcpcio.com', desc: 'XCPC 系列赛事榜单汇总', icon: 'xcpcio.svg' },
+      { name: 'Clist', url: 'https://clist.by', desc: '全球比赛日历聚合与提醒', icon: 'clist.ico' },
+      { name: 'xcpc.link', url: 'https://xcpc.link', desc: 'AWESOME XCPC：分类资源导航', icon: 'xcpclink.svg' },
+      { name: 'ICPC', url: 'https://icpc.global', desc: '国际大学生程序设计竞赛官网', icon: 'icpc.ico' },
+      { name: 'ICPC 北京总部', url: 'https://icpc.pku.edu.cn', desc: '区域赛安排与教练论坛', icon: 'icpcpku.svg' },
+      { name: 'CCPC', url: 'https://ccpc.io', desc: '中国大学生程序设计竞赛官网', icon: 'ccpc.png' },
+      { name: 'ACMer.info', url: 'https://acmer.info', desc: '面向算法竞赛选手的导航站', icon: 'acmer.ico' },
+      { name: 'Algoux', url: 'https://rl.algoux.cn', desc: 'Rating 查询与榜单综合站', icon: 'algoux.ico' },
+      { name: 'CFTracker', url: 'https://cftracker.netlify.app/contests', desc: 'Codeforces 比赛 / 题目清单追踪', icon: 'cftracker.ico' },
+      { name: 'OIerDb', url: 'https://oier.baoshuo.dev', desc: '查询选手 OI 经历', icon: 'oierdb.ico' }
+    ]
   }
 ]
 </script>
 
 <template>
-  <!-- 1 · 数据带 -->
-  <section class="hm-section hm-stats" aria-label="站点概览">
-    <ul class="hm-stats__row">
-      <li v-for="s in stats" :key="s.tag" class="hm-stats__item">
-        <p class="hm-stats__tag">{{ s.tag }}</p>
-        <p class="hm-stats__value">{{ s.value }}<span v-if="s.unit">{{ s.unit }}</span></p>
-        <p class="hm-stats__label">{{ s.label }}</p>
-      </li>
-    </ul>
-  </section>
-
-  <!-- 2 · 板块地图 -->
-  <section class="hm-section">
+  <!-- 1 · 快速链接 -->
+  <section class="hm-section hm-links" aria-label="快速链接">
     <header class="hm-head">
-      <p class="hm-head__eyebrow">SITEMAP</p>
-      <h2 class="hm-head__title">八个入口，一张地图</h2>
-      <p class="hm-head__sub">想找什么，从这里出发——每个入口都直通对应页面，不用在目录里迷路。</p>
+      <p class="hm-head__eyebrow">QUICK LINKS</p>
+      <h2 class="hm-head__title">快速链接</h2>
+      <p class="hm-head__sub">备赛常用的平台与工具，按场景分好组——从这里一步直达。</p>
     </header>
 
-    <div class="hm-bento">
-      <a
-        v-for="(m, i) in sites"
-        :key="m.title"
-        class="hm-card"
-        :class="{ 'hm-card--lg': m.featured }"
-        :href="withBase(m.link)"
-      >
-        <span class="hm-card__top">
-          <span class="hm-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-              <path v-for="(d, k) in m.paths" :key="k" :d="d" />
-            </svg>
-          </span>
-          <span class="hm-card__no" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</span>
-        </span>
+    <div class="hm-links__grid">
+      <div v-for="(g, gi) in groups" :key="g.title" class="hm-links__group">
+        <p class="hm-links__tag">
+          <span class="hm-links__no" aria-hidden="true">{{ String(gi + 1).padStart(2, '0') }}</span>
+          {{ g.title }}
+        </p>
 
-        <h3 class="hm-card__title">{{ m.title }}</h3>
-        <p class="hm-card__desc">{{ m.desc }}</p>
-
-        <span v-if="m.tags" class="hm-card__tags">
-          <span v-for="t in m.tags" :key="t" class="hm-card__tag">{{ t }}</span>
-        </span>
-
-        <span class="hm-card__more">
-          {{ m.more }}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-        </span>
-      </a>
+        <ul class="hm-links__list">
+          <li v-for="l in g.links" :key="l.url">
+            <a class="hm-links__item" :href="l.url" target="_blank" rel="noopener noreferrer">
+              <span class="hm-links__logo" aria-hidden="true">
+                <img :src="withBase(`/icons/${l.icon}`)" alt="" loading="lazy" decoding="async" />
+              </span>
+              <span class="hm-links__body">
+                <span class="hm-links__name">
+                  {{ l.name }}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M7 17 17 7" />
+                    <path d="M8 7h9v9" />
+                  </svg>
+                </span>
+                <span class="hm-links__desc">{{ l.desc }}</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 
-  <!-- 3 · 进阶阶梯 -->
-  <section class="hm-section">
-    <header class="hm-head">
-      <p class="hm-head__eyebrow">ROADMAP</p>
-      <h2 class="hm-head__title">四级阶梯，通向 XCPC</h2>
-      <p class="hm-head__sub">把成长拆成四道题：从 A 题的基础语法，到 D 题的赛场奖牌。</p>
-    </header>
-
-    <ol class="hm-ladder">
-      <li v-for="s in ladder" :key="s.key" class="hm-step" :class="`hm-step--${s.tone}`">
-        <a class="hm-step__link" :href="withBase(s.link)">
-          <span class="hm-step__key" aria-hidden="true">{{ s.key }}</span>
-          <span class="hm-step__main">
-            <span class="hm-step__title">{{ s.title }}</span>
-            <span class="hm-step__desc">{{ s.desc }}</span>
-          </span>
-          <span class="hm-step__meta">
-            <span class="hm-step__chip">
-              <b>{{ s.rating }}</b>
-              <em>{{ s.grade }}</em>
-            </span>
-            <span class="hm-step__hint">{{ s.linkText }}</span>
-            <svg class="hm-step__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
-          </span>
-        </a>
-      </li>
-    </ol>
-  </section>
-
-  <!-- 4 · 终端式收尾 -->
+  <!-- 2 · 终端式收尾 -->
   <section class="hm-section">
     <div class="hm-cta">
       <div class="hm-cta__bar">

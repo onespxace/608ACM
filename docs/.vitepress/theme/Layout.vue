@@ -8,7 +8,7 @@
  *   3. home-hero-image         右侧「判题机」面板（编辑器打字 + 提交 → AC），替代默认的 hero 图片。
  *      注意：frontmatter 里刻意不写 hero.image —— VPHero 会检查本插槽是否
  *      存在（provide('hero-image-slot-exists')），存在即启用 has-image 双栏布局。
- *   4. home-features-after     数据带 / 板块地图 / 进阶阶梯 / CTA（HomeSections）
+ *   4. home-features-after     快速链接 / CTA（HomeSections）
  *
  * 文档内图片点击放大（vitepress-plugin-image-viewer）只作用于 .vp-doc，
  * 与首页自定义区块互不影响；VitePress 的 theme.setup 已废弃，须在包裹的
@@ -66,10 +66,9 @@ const quickPaths = [
 ]
 
 /* —— 全局鼠标交互（优秀博客常见的细节动效，2026-10-07） ——
-   ① 光标跟随环：缓动跟随，悬停可交互元素时放大
-   ② 点击涟漪：任意位置点击泛起一圈绿环
-   ③ 卡片聚光灯：--mx/--my 驱动的径向高光（rAF 节流）
-   ④ 磁吸按钮：Hero 主按钮 / CTA 按钮向光标轻移（钳制 ±8px）
+   ① 点击涟漪：任意位置点击泛起一圈绿环
+   ② 卡片聚光灯：--mx/--my 驱动的径向高光（rAF 节流）
+   ③ 磁吸按钮：Hero 主按钮 / CTA 按钮向光标轻移（钳制 ±8px）
    仅对精确指针（hover + pointer:fine）启用，尊重 prefers-reduced-motion；
    聚光灯与磁吸在路由切换后重新扫描绑定。 */
 const canHover = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches
@@ -80,55 +79,8 @@ let fxCleanups: Array<() => void> = []
 function enableMouseFX() {
   if (!canHover() || calmMotion()) return
 
-  const ring = document.querySelector<HTMLElement>('.hm-cursor')
-
-  /* ① 光标跟随环 */
-  let mx = -100
-  let my = -100
-  let rx = -100
-  let ry = -100
-  let rafId = 0
-  let shown = false
-  let running = false
-
-  const loop = () => {
-    rx += (mx - rx) * 0.18
-    ry += (my - ry) * 0.18
-    if (ring) ring.style.transform = `translate3d(${rx.toFixed(1)}px, ${ry.toFixed(1)}px, 0)`
-    if (Math.abs(mx - rx) < 0.15 && Math.abs(my - ry) < 0.15) {
-      running = false
-      return
-    }
-    rafId = requestAnimationFrame(loop)
-  }
-
-  const HOT = 'a, button, [role="button"], summary, .hm-card, .hm-step__link'
-
-  const onMove = (e: MouseEvent) => {
-    mx = e.clientX
-    my = e.clientY
-    if (!shown) {
-      shown = true
-      rx = mx
-      ry = my
-      ring?.classList.add('is-on')
-    }
-    if (!running) {
-      running = true
-      rafId = requestAnimationFrame(loop)
-    }
-    const t = e.target as Element | null
-    ring?.classList.toggle('is-active', !!t?.closest?.(HOT))
-  }
-
-  const hideRing = () => {
-    shown = false
-    ring?.classList.remove('is-on')
-  }
-
-  /* ② 点击涟漪 */
+  /* ① 点击涟漪（元素在指针处生成，动画结束自动移除） */
   const onDown = (e: MouseEvent) => {
-    ring?.classList.add('is-down')
     const r = document.createElement('span')
     r.className = 'hm-fx-ripple'
     r.style.left = `${e.clientX}px`
@@ -136,13 +88,8 @@ function enableMouseFX() {
     r.addEventListener('animationend', () => r.remove())
     document.body.appendChild(r)
   }
-  const onUp = () => ring?.classList.remove('is-down')
-  const onLeave = (e: MouseEvent) => {
-    if (!e.relatedTarget) hideRing()
-  }
-  const onBlur = () => hideRing()
 
-  /* ③ 卡片聚光灯（rAF 节流，写 --mx/--my 百分比） */
+  /* ② 卡片聚光灯（rAF 节流，写 --mx/--my 百分比） */
   let spotEvent: MouseEvent | null = null
   let spotQueued = false
   const applySpot = () => {
@@ -163,7 +110,7 @@ function enableMouseFX() {
     }
   }
 
-  /* ④ 磁吸按钮（轻量、钳制位移，避免“蹦跳”感） */
+  /* ③ 磁吸按钮（轻量、钳制位移，避免“蹦跳”感） */
   const bindMagnetic = () => {
     document.querySelectorAll<HTMLElement>('.VPHome .VPHero .actions .VPButton, .hm-btn').forEach((el) => {
       if (el.dataset.mag) return
@@ -189,19 +136,15 @@ function enableMouseFX() {
   }
 
   /* 聚光灯 / 磁吸挂载（路由切换后重扫） */
-  const SPOT_SELECTOR = '.hm-card, .hm-step__link, .hm-cta__body, .vp-doc .custom-block, .vp-doc table'
+  const SPOT_SELECTOR = '.hm-links__item, .hm-cta__body, .vp-doc .custom-block, .vp-doc table'
   const decorate = () => {
     document.querySelectorAll(SPOT_SELECTOR).forEach((el) => el.classList.add('hm-spot'))
     bindMagnetic()
   }
   decorate()
 
-  document.addEventListener('mousemove', onMove, { passive: true })
   document.addEventListener('mousemove', onSpotMove, { passive: true })
   document.addEventListener('pointerdown', onDown, { passive: true })
-  document.addEventListener('pointerup', onUp, { passive: true })
-  document.documentElement.addEventListener('mouseleave', onLeave)
-  window.addEventListener('blur', onBlur)
 
   const stopWatch = watch(
     () => route.path,
@@ -209,13 +152,8 @@ function enableMouseFX() {
   )
 
   fxCleanups.push(() => {
-    document.removeEventListener('mousemove', onMove)
     document.removeEventListener('mousemove', onSpotMove)
     document.removeEventListener('pointerdown', onDown)
-    document.removeEventListener('pointerup', onUp)
-    document.documentElement.removeEventListener('mouseleave', onLeave)
-    window.removeEventListener('blur', onBlur)
-    if (rafId) cancelAnimationFrame(rafId)
     stopWatch()
   })
 }
@@ -229,12 +167,11 @@ onUnmounted(() => {
 
 <template>
   <Layout>
-    <!-- 0 · 阅读进度条（内容页显示，首页由 CSS 隐藏）+ 光标跟随环 -->
+    <!-- 0 · 阅读进度条（内容页显示，首页由 CSS 隐藏） -->
     <template #layout-top>
       <div class="hm-progress" aria-hidden="true">
         <span :style="{ transform: `scaleX(${progress})` }" />
       </div>
-      <div class="hm-cursor" aria-hidden="true" />
     </template>
 
     <!-- 1 · 状态胶囊 -->

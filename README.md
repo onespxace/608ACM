@@ -53,7 +53,7 @@ npm run docs:preview
 | `home-hero-info-before` | 状态胶囊（608 / Algorithm Training Team） | Layout.vue 内联 |
 | `home-hero-actions-after` | 终端风格快捷路径（`./guide` 等） | Layout.vue 内联 |
 | `home-hero-image` | 「判题机」面板（代码打字 + 提交 → AC + 终端） | `components/HomeJudge.vue` |
-| `home-features-after` | 数据带 / 板块地图 / 进阶阶梯 / CTA | `components/HomeSections.vue` |
+| `home-features-after` | 快速链接（30 条，带本地图标）/ CTA | `components/HomeSections.vue` |
 
 几个维护要点：
 
@@ -63,6 +63,11 @@ npm run docs:preview
   `§11 内容页` 与首页解耦，改首页不会影响内容页。
 - 动效只发生在首屏入场与悬停（不做 scroll-driven reveal），
   全部可被 `prefers-reduced-motion` 关闭。
+- 快速链接的站点图标是**本地打包**的 favicon（`docs/public/icons/`），
+  新增链接时把图标文件放进该目录，并在 `HomeSections.vue` 的 `groups` 登记文件名。
+- 「判题机」面板（`HomeJudge.vue`）是脚本驱动的小状态机：三段经典算法
+  逐字打出（长文自动下滚）→ 鼠标点「提交」→ Accepted，循环演示；
+  时间线常数在组件脚本顶部（`CHAR_MS` 等），改一处即可调速。
 
 ## 内容页主题（v2 增补）
 
