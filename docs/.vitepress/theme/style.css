@@ -9,7 +9,7 @@
  *   §2  VitePress 变量桥接
  *   §3  Hero 外壳     —— 浅色纸张 + 点阵网格
  *   §4  Hero 文案区   —— 状态胶囊 / 标题 / 按钮 / 快捷路径
- *   §5  知识地图卡片  —— 三色线路图（HomeAtlas，内联 SVG 绘制）
+ *   §5  判题机面板  —— 深色编辑器 + 终端（HomeJudge，代码逐字打出 → 提交 → AC）
  *   §6  分区骨架与标题
  *   §7  数据带
  *   §8  板块地图（bento）
@@ -78,13 +78,25 @@
   --hm-cb-danger-bg: rgba(220, 38, 38, 0.06);
   --hm-cb-danger-line: rgba(220, 38, 38, 0.32);
 
-  /* 知识地图卡片（HomeAtlas）：纸面 + 绿/蓝/琥珀三色线路 */
-  --hm-atlas-surface: #ffffff;
-  --hm-atlas-shadow: 0 30px 60px -34px rgba(11, 18, 32, 0.42), 0 2px 8px rgba(11, 18, 32, 0.06);
-  --hm-atlas-node: #ffffff;
-  --hm-atlas-green: #0a854a;
-  --hm-atlas-blue: #2563eb;
-  --hm-atlas-amber: #d97706;
+  /* 判题机面板（HomeJudge）：深色编辑器 + 终端，两种模式共用；
+     代码配色取「Tokyo Night」一脉；鼠标交互色见文件末尾 §16 */
+  --hm-panel-bg: #1a1b26;
+  --hm-panel-bar: #1f2335;
+  --hm-panel-status: #1b1e30;
+  --hm-panel-line: rgba(255, 255, 255, 0.07);
+  --hm-panel-shadow: 0 36px 70px -36px rgba(3, 8, 20, 0.55), 0 2px 10px rgba(3, 8, 20, 0.14);
+  --hm-panel-ink: #c0caf5;
+  --hm-panel-ink-2: #565f89;
+  --hm-code-pre: #f7768e;
+  --hm-code-kw: #bb9af7;
+  --hm-code-fn: #7aa2f7;
+  --hm-code-str: #9ece6a;
+  --hm-code-num: #ff9e64;
+  --hm-code-op: #89ddff;
+  --hm-code-ink: #c0caf5;
+  --hm-cursor-line: rgba(10, 133, 74, 0.7);
+  --hm-cursor-fill: rgba(10, 133, 74, 0.08);
+  --hm-spot: rgba(10, 133, 74, 0.13);
   --hm-panel-green: #3ddc84; /* 结尾 CTA 终端与 hero 光标共用 */
 
   /* 排版、尺寸与缓动 */
@@ -144,12 +156,10 @@
   --hm-cb-danger: #fca5a5;
   --hm-cb-danger-bg: rgba(248, 113, 113, 0.1);
   --hm-cb-danger-line: rgba(248, 113, 113, 0.32);
-  --hm-atlas-surface: #212127;
-  --hm-atlas-shadow: 0 30px 70px -36px rgba(0, 0, 0, 0.85), 0 2px 8px rgba(0, 0, 0, 0.4);
-  --hm-atlas-node: #2a2a33;
-  --hm-atlas-green: #3ddc84;
-  --hm-atlas-blue: #60a5fa;
-  --hm-atlas-amber: #fbbf24;
+  /* 鼠标交互色（暗色下提亮） */
+  --hm-cursor-line: rgba(61, 220, 132, 0.75);
+  --hm-cursor-fill: rgba(61, 220, 132, 0.1);
+  --hm-spot: rgba(61, 220, 132, 0.12);
 }
 
 /* ============================================================
@@ -408,9 +418,9 @@
 }
 
 /* ============================================================
-   §5 知识地图卡片（HomeAtlas）
-   —— 地铁线路图风格：纸面卡片 + 三条彩色线路，站点圆点 + 站名；
-      线路入场时描画、站点错落浮现，亮点沿核心线路循环运行
+   §5 判题机面板（HomeJudge）
+   —— 深色编辑器 + 终端（代码配色取 Tokyo Night 一脉）；
+      核心代码逐字打出，鼠标动画点击「提交」后判定 Accepted
    ============================================================ */
 
 /* 复位默认 hero 图片容器 */
@@ -437,14 +447,14 @@
   }
 }
 
-.hm-atlas {
+.hm-judge {
   position: relative;
-  width: min(100%, 462px);
+  width: min(100%, 452px);
   margin: 0 auto;
 }
 
-/* 卡片背后的色雾 */
-.hm-atlas__glow {
+/* 面板背后的色雾 */
+.hm-judge__glow {
   position: absolute;
   inset: 8% -8% -10% -12%;
   z-index: 0;
@@ -455,219 +465,299 @@
   filter: blur(26px);
 }
 
-/* —— 卡片本体：纸面地图 —— */
-.hm-atlas__card {
+/* —— 编辑器窗口 —— */
+.hm-editor {
   position: relative;
   z-index: 2;
+  margin: 0;
   border-radius: var(--hm-radius);
   overflow: hidden;
-  background: var(--hm-atlas-surface);
-  border: 1px solid var(--hm-line);
-  box-shadow: var(--hm-atlas-shadow);
+  background: var(--hm-panel-bg);
+  border: 1px solid var(--hm-panel-line);
+  box-shadow: var(--hm-panel-shadow);
 }
 
-/* —— 卡头 —— */
-.hm-atlas__bar {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 13px 18px 12px;
-  border-bottom: 1px solid var(--hm-line);
-}
-
-.hm-atlas__title {
-  font-size: 0.98rem;
-  font-weight: 750;
-  letter-spacing: -0.01em;
-  color: var(--hm-ink);
-}
-
-.hm-atlas__sub {
-  font-family: var(--hm-mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.14em;
-  color: var(--hm-ink-3);
-}
-
-.hm-atlas__badge {
-  margin-left: auto;
-  align-self: center;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-family: var(--hm-mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.1em;
-  color: var(--hm-green);
-  background: var(--hm-green-soft);
-}
-
-/* —— 地图主体（内联 SVG） —— */
-.hm-atlas__map {
-  padding: 4px 6px 0;
-}
-
-.hm-atlas__map svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* 线路：入场时沿路径描画（pathLength=100 + 虚线偏移；
-   基础态为「已完成」，动画的 from 帧负责隐藏，保证 reduced-motion 下直接可见） */
-.hm-atlas .ln {
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 100;
-  animation: hm-draw 1.05s var(--hm-ease) both;
-}
-
-.hm-atlas .ln--green {
-  stroke: var(--hm-atlas-green);
-  animation-delay: 0.3s;
-}
-
-.hm-atlas .ln--blue {
-  stroke: var(--hm-atlas-blue);
-  animation-delay: 0.55s;
-}
-
-.hm-atlas .ln--amber {
-  stroke: var(--hm-atlas-amber);
-  animation-delay: 0.55s;
-}
-
-/* 终点箭头 */
-.hm-atlas .mk {
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  animation: hm-fade-in 0.4s ease both;
-  animation-delay: 1.05s;
-}
-
-.hm-atlas .mk--green {
-  stroke: var(--hm-atlas-green);
-}
-
-.hm-atlas .mk--blue {
-  stroke: var(--hm-atlas-blue);
-}
-
-.hm-atlas .mk--amber {
-  stroke: var(--hm-atlas-amber);
-}
-
-/* 起点标记 */
-.hm-atlas .cap {
-  animation: hm-fade-in 0.45s ease both;
-  animation-delay: 0.5s;
-}
-
-.hm-atlas .cap--ring {
-  fill: none;
-  stroke: var(--hm-atlas-green);
-  stroke-width: 1.6;
-  stroke-opacity: 0.32;
-}
-
-.hm-atlas .cap--dot {
-  fill: var(--hm-atlas-green);
-}
-
-/* —— 站点：圆点 + 站名（--d 由组件内联给出，错落入场） —— */
-.hm-atlas .st {
-  fill: var(--hm-atlas-node);
-  stroke-width: 2.6;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: hm-st-in 0.5s var(--hm-ease) both;
-  animation-delay: var(--d, 0.6s);
-}
-
-.hm-atlas .st--green {
-  stroke: var(--hm-atlas-green);
-}
-
-.hm-atlas .st--blue {
-  stroke: var(--hm-atlas-blue);
-}
-
-.hm-atlas .st--amber {
-  stroke: var(--hm-atlas-amber);
-}
-
-.hm-atlas text {
-  font-size: 12.5px;
-  font-weight: 500;
-  fill: var(--hm-ink-2);
-  animation: hm-fade-in 0.45s ease both;
-  animation-delay: var(--d, 0.8s);
-}
-
-.hm-atlas text.is-transfer {
-  fill: var(--hm-ink);
-  font-weight: 700;
-}
-
-/* —— 沿核心线路循环运行的亮点（位移由 SMIL 驱动，这里只管外观与淡入） —— */
-.hm-atlas__trainWrap {
-  opacity: 0;
-  animation: hm-fade-in 0.5s ease both;
-  animation-delay: 1.6s;
-}
-
-.hm-atlas__train {
-  fill: var(--hm-atlas-node);
-  stroke: var(--hm-atlas-green);
-  stroke-width: 2.4;
-}
-
-/* —— 卡脚图例 —— */
-.hm-atlas__legend {
+.hm-editor__bar {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 11px 18px;
-  border-top: 1px solid var(--hm-line);
-  background: var(--hm-tint);
-  font-size: 0.72rem;
-  color: var(--hm-ink-2);
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--hm-panel-bar);
+  border-bottom: 1px solid var(--hm-panel-line);
 }
 
-.hm-atlas__lg {
+.hm-editor__tab {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: rgba(122, 162, 247, 0.12);
+  font-family: var(--hm-mono);
+  font-size: 0.74rem;
+  color: var(--hm-code-ink);
 }
 
-.hm-atlas__lg::before {
-  content: '';
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 2.5px solid;
+.hm-editor__tab svg {
+  width: 13px;
+  height: 13px;
+  color: var(--hm-code-fn);
 }
 
-.lg--green::before {
-  border-color: var(--hm-atlas-green);
-}
-
-.lg--blue::before {
-  border-color: var(--hm-atlas-blue);
-}
-
-.lg--amber::before {
-  border-color: var(--hm-atlas-amber);
-}
-
-.hm-atlas__count {
+.hm-editor__lang {
   margin-left: auto;
   font-family: var(--hm-mono);
   font-size: 0.68rem;
-  color: var(--hm-ink-3);
+  letter-spacing: 0.1em;
+  color: var(--hm-panel-ink-2);
+}
+
+/* —— 代码区 —— */
+.hm-editor__code {
+  margin: 0;
+  padding: 14px 0 16px;
+  font-family: var(--hm-mono);
+  font-size: 0.8rem;
+  line-height: 1.75;
+  color: var(--hm-code-ink);
+  counter-reset: hm-line;
+  overflow: hidden;
+}
+
+.hm-editor__code code {
+  display: block;
+  font-family: inherit;
+}
+
+/* 代码行：flex 两列（行号 + 内容），行号由计数器生成。
+   注意：着色 token 必须包在单一内容节点（.hm-editor__text / .hm-type）里，
+   不能把 token span 直接铺成 flex 子项，否则会被撑散。 */
+.hm-editor__line {
+  display: flex;
+  align-items: baseline;
+  padding: 0 18px 0 14px;
+  min-height: 1.75em;
+  white-space: pre;
+  counter-increment: hm-line;
+  animation: hm-line-in 0.5s var(--hm-ease) both;
+}
+
+.hm-editor__line::before {
+  content: counter(hm-line);
+  flex: none;
+  width: 2.2ch;
+  margin-right: 16px;
+  text-align: right;
+  color: #3b4261;
+}
+
+.hm-editor__text {
+  white-space: pre;
+}
+
+/* 逐字打出的行：宽度 0 → nch（steps 走字），动画参数由组件内联给出；
+   基础宽度 auto，保证 reduced-motion 下直接完整可见 */
+.hm-type {
+  display: block;
+  overflow: hidden;
+  white-space: pre;
+  width: auto;
+}
+
+.hm-type__caret {
+  flex: none;
+  width: 7px;
+  height: 1.02em;
+  margin-left: 2px;
+  border-radius: 1px;
+  background: var(--hm-code-fn);
+  opacity: 0;
+}
+
+/* —— 语法着色（Tokyo Night 一脉） —— */
+.hm-editor__code .t-pre {
+  color: var(--hm-code-pre);
+}
+
+.hm-editor__code .t-kw {
+  color: var(--hm-code-kw);
+}
+
+.hm-editor__code .t-fn {
+  color: var(--hm-code-fn);
+}
+
+.hm-editor__code .t-str {
+  color: var(--hm-code-str);
+}
+
+.hm-editor__code .t-num {
+  color: var(--hm-code-num);
+}
+
+.hm-editor__code .t-op {
+  color: var(--hm-code-op);
+}
+
+/* —— 判定栏：待提交 → 评测中… → Accepted —— */
+.hm-editor__status {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 8px 12px 8px 16px;
+  background: var(--hm-panel-status);
+  border-top: 1px solid var(--hm-panel-line);
+  font-family: var(--hm-mono);
+  font-size: 0.74rem;
+}
+
+.hm-editor__v0,
+.hm-editor__v1,
+.hm-editor__v2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.hm-editor__v0 {
+  color: var(--hm-panel-ink-2);
+}
+
+.hm-editor__v1,
+.hm-editor__v2 {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  translate: 0 -50%;
+  opacity: 0;
+}
+
+.hm-editor__v1 {
+  color: #e0af68;
+}
+
+.hm-editor__v2 {
+  color: var(--hm-panel-green);
+  font-weight: 700;
+}
+
+.hm-editor__v2 svg {
+  width: 13px;
+  height: 13px;
+}
+
+.hm-editor__spin {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid rgba(224, 175, 104, 0.3);
+  border-top-color: #e0af68;
+  animation: hm-spin 0.7s linear infinite;
+}
+
+.hm-editor__sep {
+  font-style: normal;
+  color: var(--hm-panel-ink-2);
+}
+
+.hm-editor__stat {
+  color: var(--hm-panel-ink-2);
+  font-weight: 500;
+}
+
+/* —— 提交按钮（鼠标动画的落点，纯装饰不可点） —— */
+.hm-editor__submit {
+  margin-left: auto;
+  padding: 5px 14px 6px;
+  border: none;
+  border-radius: 8px;
+  background: var(--hm-panel-green);
+  color: #07160e;
+  font-family: var(--hm-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 16px -8px rgba(61, 220, 132, 0.6);
+  pointer-events: none;
+}
+
+/* —— 点击涟漪（在按钮中心扩散） —— */
+.hm-editor__ripple {
+  position: absolute;
+  right: 30px;
+  bottom: 14px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--hm-panel-green);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* —— 鼠标指针（滑入 → 点击 → 离场；位移由 hm-cursor-ride 驱动） —— */
+.hm-editor__cursor {
+  position: absolute;
+  right: 22px;
+  bottom: 0;
+  z-index: 4;
+  width: 16px;
+  height: 22px;
+  opacity: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.hm-editor__cursor svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+}
+
+/* —— 终端窗口 —— */
+.hm-shell {
+  position: relative;
+  z-index: 2;
+  width: 88%;
+  margin: 12px 0 0;
+  padding: 11px 14px 12px;
+  border-radius: 12px;
+  background: var(--hm-panel-bg);
+  border: 1px solid var(--hm-panel-line);
+  box-shadow: var(--hm-panel-shadow);
+  font-family: var(--hm-mono);
+  font-size: 0.74rem;
+  line-height: 1.9;
+}
+
+.hm-shell__line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: hm-line-in 0.5s var(--hm-ease) both;
+}
+
+.hm-shell__prompt {
+  color: var(--hm-panel-green);
+  font-weight: 700;
+}
+
+.hm-shell__cmd {
+  color: var(--hm-code-ink);
+}
+
+.hm-shell__caret {
+  flex: none;
+  width: 7px;
+  height: 13px;
+  border-radius: 1px;
+  background: var(--hm-panel-green);
+  animation: hm-blink 1.15s step-end infinite;
 }
 
 /* 窗口圆点：与结尾 CTA 的终端窗口共用 */
@@ -1706,21 +1796,126 @@ html:has(.VPHome) .hm-progress {
   }
 }
 
-/* 线路描画（与 pathLength=100 的虚线偏移配合） */
-@keyframes hm-draw {
+/* 代码行 / 终端行：自左滑入 */
+@keyframes hm-line-in {
   from {
-    stroke-dashoffset: 100;
+    opacity: 0;
+    translate: -6px 0;
   }
   to {
-    stroke-dashoffset: 0;
+    opacity: 1;
+    translate: 0 0;
   }
 }
 
-/* 站点圆点：缩放浮现 */
-@keyframes hm-st-in {
+/* 逐字打出：宽度 0 → nch（steps 节奏由组件内联在 animation 里） */
+@keyframes hm-type {
+  from {
+    width: 0;
+  }
+  to {
+    width: calc(var(--chars) * 1ch + 1px);
+  }
+}
+
+/* 鼠标指针：滑入（0→30%）→ 悬停 → 按下回弹（38%±）→ 离场（89%→100%） */
+@keyframes hm-cursor-ride {
+  0% {
+    transform: translate(88px, 46px);
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.25, 0.9, 0.3, 1);
+  }
+  6% {
+    opacity: 1;
+  }
+  30% {
+    transform: translate(0, 0);
+  }
+  38% {
+    transform: translate(0, 0);
+    animation-timing-function: ease-in-out;
+  }
+  40.5% {
+    transform: translate(1px, 1px) scale(0.86);
+  }
+  45% {
+    transform: translate(0, 0) scale(1);
+  }
+  89% {
+    transform: translate(0, 0);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  100% {
+    transform: translate(34px, 40px);
+    opacity: 0;
+  }
+}
+
+/* 提交按钮：按压回弹 */
+@keyframes hm-press {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 提交按钮：判定完成后转「已提交」形态 */
+@keyframes hm-btn-done {
+  to {
+    opacity: 0.55;
+    box-shadow: none;
+  }
+}
+
+/* 点击涟漪 */
+@keyframes hm-ripple-out {
+  from {
+    transform: scale(0.4);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* 判定区：待提交淡出 */
+@keyframes hm-verdict-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* 判定区：评测中淡入 → 停留 → 淡出 */
+@keyframes hm-verdict-judging {
+  0% {
+    opacity: 0;
+  }
+  9% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 判定区：Accepted 弹入 */
+@keyframes hm-accepted-in {
   from {
     opacity: 0;
-    transform: scale(0.3);
+    transform: scale(0.86);
   }
   to {
     opacity: 1;
@@ -1728,13 +1923,20 @@ html:has(.VPHome) .hm-progress {
   }
 }
 
-/* 站名与标记：淡入 */
-@keyframes hm-fade-in {
+/* 编辑器光标：淡入，随后交给 hm-blink 闪烁 */
+@keyframes hm-caret-in {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
+  }
+}
+
+/* 评测中的旋转指示器 */
+@keyframes hm-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -1755,7 +1957,7 @@ html:has(.VPHome) .hm-progress {
 .VPHome .VPHero .main .tagline,
 .VPHome .VPHero .actions,
 .hm-paths,
-.hm-atlas {
+.hm-judge {
   animation: hm-rise 0.66s var(--hm-ease) both;
 }
 
@@ -1775,7 +1977,7 @@ html:has(.VPHome) .hm-progress {
   animation-delay: 0.24s;
 }
 
-.hm-atlas {
+.hm-judge {
   animation-delay: 0.12s;
 }
 
@@ -1816,7 +2018,7 @@ html:has(.VPHome) .hm-progress {
     padding: calc(var(--vp-nav-height) + 48px) var(--hm-gutter) 72px;
   }
 
-  /* 移动端：文案在前，知识地图在后 */
+  /* 移动端：文案在前，判题机面板在后 */
   .VPHome .VPHero .image {
     order: 3;
     margin: 34px 0 0;
@@ -1826,7 +2028,7 @@ html:has(.VPHome) .hm-progress {
     margin-inline: auto;
   }
 
-  .hm-atlas {
+  .hm-judge {
     width: min(100%, 430px);
   }
 }
@@ -1887,7 +2089,7 @@ html:has(.VPHome) .hm-progress {
     gap: 6px 16px;
   }
 
-  .hm-atlas {
+  .hm-judge {
     width: 100%;
   }
 }
@@ -1907,18 +2109,39 @@ html:has(.VPHome) .hm-progress {
   .hm-status,
   .hm-status__dot::after,
   .hm-caret,
-  .hm-atlas,
-  .hm-atlas .ln,
-  .hm-atlas .mk,
-  .hm-atlas .cap,
-  .hm-atlas .st,
-  .hm-atlas text,
-  .hm-atlas__trainWrap,
+  .hm-judge,
+  .hm-editor__line,
+  .hm-type,
+  .hm-type__caret,
+  .hm-editor__cursor,
+  .hm-editor__ripple,
+  .hm-editor__submit,
+  .hm-editor__v0,
+  .hm-editor__v1,
+  .hm-editor__v2,
+  .hm-editor__spin,
+  .hm-shell__line,
+  .hm-shell__caret,
   .VPHome .VPHero .main .heading,
   .VPHome .VPHero .main .tagline,
   .VPHome .VPHero .actions,
   .hm-paths {
     animation: none !important;
+  }
+
+  /* 判题机面板：直接呈现最终态（代码完整 + Accepted） */
+  .hm-editor__v0,
+  .hm-editor__v1 {
+    display: none;
+  }
+
+  .hm-editor__v2 {
+    opacity: 1;
+  }
+
+  .hm-editor__cursor,
+  .hm-editor__ripple {
+    display: none;
   }
 
   .hm-card,
@@ -1951,4 +2174,154 @@ html:has(.VPHome) .hm-progress {
 
 ::selection {
   background-color: var(--hm-green-soft);
+}
+
+/* ============================================================
+   §16 全局鼠标交互（2026-10-07）
+   —— 光标跟随环 / 点击涟漪 / 卡片聚光灯 / 导航下划线 / 按钮按压。
+      仅对精确指针设备启用（Layout.vue 判定 hover + pointer:fine），
+      并尊重 prefers-reduced-motion（见本节末尾覆盖）。
+   ============================================================ */
+
+/* 光标跟随环（元素由 Layout.vue 注入，位移由 JS 缓动跟随驱动）
+   结构：0 尺寸定位点（JS 只改它的 translate）+ ::before 画环。
+   —— 放大必须作用在伪元素上：若直接 scale 定位点自身，位移会被一起放大，
+      环就会漂离指针（scale 与 translate 的合成顺序所致）。 */
+.hm-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+
+.hm-cursor::before {
+  content: '';
+  position: absolute;
+  left: -13px;
+  top: -13px;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid var(--hm-cursor-line);
+  border-radius: 50%;
+  background: transparent;
+  transition: scale 0.22s var(--hm-ease), background-color 0.22s ease;
+}
+
+.hm-cursor.is-on {
+  opacity: 1;
+}
+
+.hm-cursor.is-active::before {
+  scale: 1.55;
+  background: var(--hm-cursor-fill);
+}
+
+.hm-cursor.is-down::before {
+  scale: 0.82;
+}
+
+/* 点击涟漪（JS 在指针位置生成，动画结束自动移除） */
+.hm-fx-ripple {
+  position: fixed;
+  z-index: 9998;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid var(--hm-cursor-line);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: hm-fx-ripple 0.62s var(--hm-ease-soft) forwards;
+}
+
+@keyframes hm-fx-ripple {
+  from {
+    transform: scale(0.45);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* 卡片聚光灯：--mx/--my 由 JS 写入，悬停时点亮 */
+.hm-spot {
+  position: relative;
+}
+
+.hm-spot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), var(--hm-spot), transparent 68%);
+}
+
+.hm-spot:hover::after {
+  opacity: 1;
+}
+
+/* 导航栏：悬停 / 激活时文字下方展开一条签名绿短线
+   （本站导航为下拉组 VPNavBarMenuGroup；VPNavBarMenuLink 兼容直链场景） */
+.VPNavBarMenuLink > span:not([class]),
+.VPNavBarMenuGroup .text > span:not([class]) {
+  position: relative;
+}
+
+.VPNavBarMenuLink > span:not([class])::after,
+.VPNavBarMenuGroup .text > span:not([class])::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 99px;
+  background: var(--hm-green);
+  transition: left 0.28s var(--hm-ease), right 0.28s var(--hm-ease);
+}
+
+.VPNavBarMenuLink:hover > span:not([class])::after,
+.VPNavBarMenuLink.active > span:not([class])::after,
+.VPNavBarMenuGroup:hover .text > span:not([class])::after,
+.VPNavBarMenuGroup.active .text > span:not([class])::after {
+  left: 0;
+  right: 0;
+}
+
+/* 按钮按压反馈（触感） */
+.VPHome .VPHero .actions .VPButton:active,
+.hm-btn:active {
+  scale: 0.97;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-cursor,
+  .hm-fx-ripple {
+    display: none;
+  }
+
+  .hm-spot::after {
+    display: none;
+  }
+
+  .VPNavBarMenuLink > span:not([class])::after,
+  .VPNavBarMenuGroup .text > span:not([class])::after {
+    display: none;
+  }
+
+  .VPHome .VPHero .actions .VPButton:active,
+  .hm-btn:active {
+    scale: 1;
+  }
 }

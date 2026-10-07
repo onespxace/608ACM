@@ -52,7 +52,7 @@ npm run docs:preview
 | --- | --- | --- |
 | `home-hero-info-before` | 状态胶囊（608 / Algorithm Training Team） | Layout.vue 内联 |
 | `home-hero-actions-after` | 终端风格快捷路径（`./guide` 等） | Layout.vue 内联 |
-| `home-hero-image` | 「算法知识地图」卡片（地铁路线图风格） | `components/HomeAtlas.vue` |
+| `home-hero-image` | 「判题机」面板（代码打字 + 提交 → AC + 终端） | `components/HomeJudge.vue` |
 | `home-features-after` | 数据带 / 板块地图 / 进阶阶梯 / CTA | `components/HomeSections.vue` |
 
 几个维护要点：

@@ -3,7 +3,7 @@
 # 结构 = frontmatter 的 hero 文案 + theme/Layout.vue 注入的四个插槽：
 #   home-hero-info-before   → 顶部状态胶囊
 #   home-hero-actions-after → 终端风格快捷路径
-#   home-hero-image         → 右侧「算法知识地图」卡片（不设 image 字段，靠插槽触发 has-image 布局）
+#   home-hero-image         → 右侧「判题机」面板（代码打字 + 提交 → AC，不设 image 字段，靠插槽触发 has-image 布局）
 #   home-features-after     → 数据带 / 板块地图 / 进阶阶梯 / CTA
 layout: home
 
