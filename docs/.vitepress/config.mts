@@ -22,7 +22,7 @@ export default defineConfig({
     ['meta', { name: 'author', content: '608ACM' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: '608ACM · 郑州工商学院软件设计创新工作室算法集训队' }],
-    ['meta', { property: 'og:description', content: '从第一行 C++ 到 XCPC 领奖台：入门指北、ICPC/CCPC 赛事说明、训练资源与常用网站导航。' }],
+    ['meta', { property: 'og:description', content: '从第一行 C++ 到 XCPC 领奖台：入门指北、ICPC/CCPC 赛事说明与备赛资源导航。' }],
     ['meta', { property: 'og:image', content: `${base}icpc.png` }]
   ],
 
@@ -93,9 +93,7 @@ export default defineConfig({
         items: [
           { text: 'ICPC', link: '/contests/icpc' },
           { text: 'CCPC', link: '/contests/ccpc' },
-          { text: '牛客多校', link: '/contests/nowcoder' },
-          { text: '常用网站导航', link: '/contests/acm-websites' },
-          { text: '常用资源', link: '/contests/resources' }
+          { text: '牛客多校', link: '/contests/nowcoder' }
         ]
       }
     ],
@@ -123,9 +121,7 @@ export default defineConfig({
           items: [
             { text: 'ICPC', link: '/contests/icpc' },
             { text: 'CCPC', link: '/contests/ccpc' },
-            { text: '牛客多校', link: '/contests/nowcoder' },
-            { text: '常用网站导航', link: '/contests/acm-websites' },
-            { text: '常用资源', link: '/contests/resources' }
+            { text: '牛客多校', link: '/contests/nowcoder' }
           ]
         }
       ],
@@ -151,9 +147,7 @@ export default defineConfig({
           items: [
             { text: 'ICPC', link: '/contests/icpc' },
             { text: 'CCPC', link: '/contests/ccpc' },
-            { text: '牛客多校', link: '/contests/nowcoder' },
-            { text: '常用网站导航', link: '/contests/acm-websites' },
-            { text: '常用资源', link: '/contests/resources' }
+            { text: '牛客多校', link: '/contests/nowcoder' }
           ]
         }
       ],
@@ -179,9 +173,7 @@ export default defineConfig({
           items: [
             { text: 'ICPC', link: '/contests/icpc' },
             { text: 'CCPC', link: '/contests/ccpc' },
-            { text: '牛客多校', link: '/contests/nowcoder' },
-            { text: '常用网站导航', link: '/contests/acm-websites' },
-            { text: '常用资源', link: '/contests/resources' }
+            { text: '牛客多校', link: '/contests/nowcoder' }
           ]
         }
       ]
