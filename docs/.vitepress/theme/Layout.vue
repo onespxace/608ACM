@@ -5,7 +5,7 @@
  * 插槽分工（与 docs/index.md、style.css 的三方约定）：
  *   1. home-hero-info-before   状态胶囊（608 / Algorithm Training Team）
  *   2. home-hero-actions-after 终端风格快捷路径（./guide 等）
- *   3. home-hero-image         右侧「现场榜单」卡片，替代默认的 hero 图片。
+ *   3. home-hero-image         右侧「算法知识地图」卡片，替代默认的 hero 图片。
  *      注意：frontmatter 里刻意不写 hero.image —— VPHero 会检查本插槽是否
  *      存在（provide('hero-image-slot-exists')），存在即启用 has-image 双栏布局。
  *   4. home-features-after     数据带 / 板块地图 / 进阶阶梯 / CTA（HomeSections）
@@ -18,7 +18,7 @@ import DefaultTheme from 'vitepress/theme'
 import { useRoute, withBase } from 'vitepress'
 import { onMounted, onUnmounted, ref } from 'vue'
 import imageViewer from 'vitepress-plugin-image-viewer'
-import HomeBoard from './components/HomeBoard.vue'
+import HomeAtlas from './components/HomeAtlas.vue'
 import HomeSections from './components/HomeSections.vue'
 
 const { Layout } = DefaultTheme
@@ -100,9 +100,9 @@ const quickPaths = [
       </nav>
     </template>
 
-    <!-- 3 · 现场榜单卡片 -->
+    <!-- 3 · 算法知识地图卡片 -->
     <template #home-hero-image>
-      <HomeBoard />
+      <HomeAtlas />
     </template>
 
     <!-- 4 · 首页主体分区 -->
