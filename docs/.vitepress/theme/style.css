@@ -94,7 +94,8 @@
   --hm-code-str: #ce9178;
   --hm-code-num: #b5cea8;
   --hm-code-op: #d4d4d4;
-  --hm-code-ink: #d4d4d4;
+  /* 注意：这里曾误定义 --hm-code-ink（与内容页行内代码同名互相覆盖，
+     导致浅色模式行内代码发白）。面板基础文字统一用 --hm-panel-ink。 */
   --hm-cursor-line: rgba(10, 133, 74, 0.7);
   --hm-spot: rgba(10, 133, 74, 0.13);
   --hm-panel-green: #3ddc84; /* 结尾 CTA 终端与 hero 光标共用 */
@@ -494,7 +495,7 @@
   background: rgba(86, 156, 214, 0.16);
   font-family: var(--hm-mono);
   font-size: 0.74rem;
-  color: var(--hm-code-ink);
+  color: var(--hm-panel-ink);
 }
 
 .hm-editor__tab svg {
@@ -539,7 +540,7 @@
   font-family: var(--hm-mono);
   font-size: 0.8rem;
   line-height: 1.75;
-  color: var(--hm-code-ink);
+  color: var(--hm-panel-ink);
   counter-reset: hm-line;
   overflow: hidden;
   mask-image: linear-gradient(180deg, #000 86%, transparent 100%);
@@ -811,7 +812,7 @@
 }
 
 .hm-shell__cmd {
-  color: var(--hm-code-ink);
+  color: var(--hm-panel-ink);
 }
 
 .hm-shell__caret {
