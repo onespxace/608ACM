@@ -914,9 +914,9 @@
 
 /* ============================================================
    §7 快速链接
-   —— 参考山东理工 ACM 官网与 xcpc.link 的资源导航体例：
-      三组（题库训练 / 工具资料 / 榜单赛讯），名 + 一句话说明；
-      留白优先，悬停只做「名字变绿 + 箭头右上滑出」的轻反馈
+   —— 参考山东理工 ACM 官网与 xcpc.link（AWESOME XCPC）的资源导航体例：
+      四组（题库评测 / 学习资料 / 实用工具 / 榜单赛事），名 + 一句话说明；
+      桌面四列、平板 2×2；移动端（≤640px，见 §13）改为组内双列图标芯片
    ============================================================ */
 .hm-links {
   padding-top: 6px;
@@ -924,8 +924,8 @@
 
 .hm-links__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 44px 56px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 40px 36px;
 }
 
 .hm-links__tag {
@@ -962,7 +962,7 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 12px 2px;
+  padding: 11px 2px;
   text-decoration: none;
 }
 
@@ -1746,7 +1746,8 @@ html:has(.VPHome) .hm-progress {
 /* ============================================================
    §13 响应式
    ============================================================ */
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
+  /* 快速链接：四组收为 2×2（每列 ~450px，描述保持单行） */
   .hm-links__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 38px 44px;
@@ -1778,9 +1779,75 @@ html:has(.VPHome) .hm-progress {
     --hm-gutter: 20px;
   }
 
+  /* 快速链接 · 移动端：组内双列「图标 + 名称」芯片。
+     59 条若沿单列铺开会长得滚不到头；芯片隐藏描述、放大点按区域
+     （≥48px）、加 :active 触感反馈，组与组之间留出呼吸。 */
   .hm-links__grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 34px;
+    gap: 30px;
+  }
+
+  .hm-links__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .hm-links__list li {
+    display: flex;
+  }
+
+  .hm-links__list li + li {
+    border-top: none;
+  }
+
+  .hm-links__item {
+    flex: 1;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 11px;
+    min-height: 50px;
+    border: 1px solid var(--hm-line);
+    border-radius: 12px;
+    background: var(--hm-tint);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 触屏没有 hover，用按压态给反馈 */
+  .hm-links__item:active {
+    background: var(--hm-green-soft);
+    border-color: var(--hm-green);
+  }
+
+  .hm-links__logo {
+    width: 26px;
+    height: 26px;
+    margin-top: 0;
+    border-radius: 7px;
+  }
+
+  .hm-links__logo img {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* 名称最多两行（"Another Graph Editor" 这类长名不至于被截成一条） */
+  .hm-links__name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 0.84rem;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .hm-links__name svg {
+    display: none;
+  }
+
+  .hm-links__desc {
+    display: none;
   }
 
   .hm-section + .hm-section {

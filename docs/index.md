@@ -4,7 +4,7 @@
 #   home-hero-info-before   → 顶部状态胶囊
 #   home-hero-actions-after → 终端风格快捷路径
 #   home-hero-image         → 右侧「判题机」面板（代码打字 + 提交 → AC，不设 image 字段，靠插槽触发 has-image 布局）
-#   home-features-after     → 快速链接（30 条常用站点，本地图标）+ CTA
+#   home-features-after     → 快速链接（四组 59 条常用站点，本地图标）+ CTA
 layout: home
 
 hero:

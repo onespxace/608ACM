@@ -53,7 +53,7 @@ npm run docs:preview
 | `home-hero-info-before` | 状态胶囊（608 / Algorithm Training Team） | Layout.vue 内联 |
 | `home-hero-actions-after` | 终端风格快捷路径（`./guide` 等） | Layout.vue 内联 |
 | `home-hero-image` | 「判题机」面板（代码打字 + 提交 → AC + 终端） | `components/HomeJudge.vue` |
-| `home-features-after` | 快速链接（30 条，带本地图标）/ CTA | `components/HomeSections.vue` |
+| `home-features-after` | 快速链接（四组 59 条，带本地图标）/ CTA | `components/HomeSections.vue` |
 
 几个维护要点：
 
