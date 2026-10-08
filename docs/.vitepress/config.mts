@@ -77,8 +77,8 @@ export default defineConfig({
         items: [
           { text: '算法竞赛入门指北', link: '/guide/' },
           { text: '萌新认识与入门算法竞赛', link: '/guide/xcpc-beginner-guide' },
-          { text: '提问的智慧', link: '/guide/smart-questions' },
           { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
+          { text: '提问的智慧', link: '/guide/smart-questions' },
           { text: '计算机入门', link: '/guide/computer-intro' }
         ]
       },
@@ -106,8 +106,8 @@ export default defineConfig({
           items: [
             { text: '算法竞赛入门指北', link: '/guide/' },
             { text: '萌新认识与入门算法竞赛', link: '/guide/xcpc-beginner-guide' },
-            { text: '提问的智慧', link: '/guide/smart-questions' },
             { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
+            { text: '提问的智慧', link: '/guide/smart-questions' },
             { text: '计算机入门', link: '/guide/computer-intro' }
           ]
         },
@@ -133,8 +133,8 @@ export default defineConfig({
           items: [
             { text: '算法竞赛入门指北', link: '/guide/' },
             { text: '萌新认识与入门算法竞赛', link: '/guide/xcpc-beginner-guide' },
-            { text: '提问的智慧', link: '/guide/smart-questions' },
             { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
+            { text: '提问的智慧', link: '/guide/smart-questions' },
             { text: '计算机入门', link: '/guide/computer-intro' }
           ]
         },
@@ -160,8 +160,8 @@ export default defineConfig({
           items: [
             { text: '算法竞赛入门指北', link: '/guide/' },
             { text: '萌新认识与入门算法竞赛', link: '/guide/xcpc-beginner-guide' },
-            { text: '提问的智慧', link: '/guide/smart-questions' },
             { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
+            { text: '提问的智慧', link: '/guide/smart-questions' },
             { text: '计算机入门', link: '/guide/computer-intro' }
           ]
         },
