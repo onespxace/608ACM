@@ -1,0 +1,222 @@
+/**
+ * 主题样式模块：响应式 / 降级 / 可访问性收尾（§13–§15）
+ * 由 theme/style.css 拆分而来 —— 顺序由入口文件的 @import 保证，勿单独调整顺序。
+ */
+
+/* ============================================================
+   §13 响应式
+   ============================================================ */
+@media (max-width: 1100px) {
+  /* 快速链接：四组收为 2×2（每列 ~450px，描述保持单行） */
+  .hm-links__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 38px 44px;
+  }
+}
+
+@media (max-width: 959px) {
+  .VPHome .VPHero.VPHomeHero {
+    padding: calc(var(--vp-nav-height) + 48px) var(--hm-gutter) 72px;
+  }
+
+  /* 移动端：文案在前，判题机面板在后 */
+  .VPHome .VPHero .image {
+    order: 3;
+    margin: 34px 0 0;
+  }
+
+  .VPHome .VPHero .main .tagline {
+    margin-inline: auto;
+  }
+
+  .hm-judge {
+    width: min(100%, 430px);
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --hm-gutter: 20px;
+  }
+
+  /* 快速链接 · 移动端：组内双列「图标 + 名称」芯片。
+     59 条若沿单列铺开会长得滚不到头；芯片隐藏描述、放大点按区域
+     （≥48px）、加 :active 触感反馈，组与组之间留出呼吸。 */
+  .hm-links__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+  }
+
+  .hm-links__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .hm-links__list li {
+    display: flex;
+  }
+
+  .hm-links__list li + li {
+    border-top: none;
+  }
+
+  .hm-links__item {
+    flex: 1;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 11px;
+    min-height: 50px;
+    border: 1px solid var(--hm-line);
+    border-radius: 12px;
+    background: var(--hm-tint);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 触屏没有 hover，用按压态给反馈 */
+  .hm-links__item:active {
+    background: var(--hm-green-soft);
+    border-color: var(--hm-green);
+  }
+
+  .hm-links__logo {
+    width: 26px;
+    height: 26px;
+    margin-top: 0;
+    border-radius: 7px;
+  }
+
+  .hm-links__logo img {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* 名称最多两行（"Another Graph Editor" 这类长名不至于被截成一条） */
+  .hm-links__name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 0.84rem;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .hm-links__name svg {
+    display: none;
+  }
+
+  .hm-links__desc {
+    display: none;
+  }
+
+  .hm-section + .hm-section {
+    padding-top: 64px;
+  }
+
+  .hm-cta__body {
+    padding: 30px 22px 26px;
+  }
+
+  .hm-cta__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hm-btn {
+    justify-content: center;
+  }
+
+  .VPHome .VPHero .main .name {
+    font-size: clamp(2.7rem, 13vw, 3.4rem);
+  }
+
+  .hm-paths {
+    gap: 6px 16px;
+  }
+
+  .hm-judge {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   §14 降低动效偏好
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  .vp-doc {
+    animation: none !important;
+  }
+
+  .hm-status,
+  .hm-status__dot::after,
+  .hm-caret,
+  .hm-judge,
+  .hm-editor__caret,
+  .hm-editor__cursor,
+  .hm-editor__ripple,
+  .hm-editor__submit,
+  .hm-editor__v0,
+  .hm-editor__v1,
+  .hm-editor__v2,
+  .hm-editor__spin,
+  .hm-shell__line,
+  .hm-shell__caret,
+  .VPHome .VPHero .main .heading,
+  .VPHome .VPHero .main .tagline,
+  .VPHome .VPHero .actions,
+  .hm-paths {
+    animation: none !important;
+  }
+
+  /* 判题机面板：直接呈现最终态（代码完整 + Accepted） */
+  .hm-editor__v0,
+  .hm-editor__v1 {
+    display: none;
+  }
+
+  .hm-editor__v2 {
+    opacity: 1;
+  }
+
+  .hm-editor__cursor,
+  .hm-editor__ripple {
+    display: none;
+  }
+
+  .hm-links__item,
+  .hm-links__name,
+  .hm-links__name svg,
+  .hm-editor__scroll,
+  .hm-editor__v0,
+  .hm-editor__v1,
+  .hm-editor__v2,
+  .hm-editor__submit,
+  .hm-btn,
+  .VPHome .VPHero .actions .VPButton,
+  .hm-paths__path,
+  .hm-paths__label {
+    transition: none !important;
+  }
+
+  .hm-btn:hover,
+  .VPHome .VPHero .actions .VPButton:hover {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   §15 可访问性收尾
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--hm-green);
+  outline-offset: 2px;
+}
+
+::selection {
+  background-color: var(--hm-green-soft);
+}

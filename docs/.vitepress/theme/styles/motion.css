@@ -1,0 +1,164 @@
+/**
+ * 主题样式模块：动效与关键帧（§12）
+ * 由 theme/style.css 拆分而来 —— 顺序由入口文件的 @import 保证，勿单独调整顺序。
+ */
+
+/* ============================================================
+   §12 动效
+   ============================================================ */
+@keyframes hm-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes hm-ping {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.7);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* 首屏入场：只作用于 Hero（一定在首屏内），不依赖滚动 */
+@keyframes hm-rise {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes hm-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 代码行 / 终端行：自左滑入 */
+@keyframes hm-line-in {
+  from {
+    opacity: 0;
+    translate: -6px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* 鼠标指针：自右下滑入，停在按钮上 */
+@keyframes hm-cursor-in {
+  from {
+    transform: translate(88px, 46px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
+/* 鼠标指针：判定完成后飘走 */
+@keyframes hm-cursor-bye {
+  from {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(30px, 34px);
+    opacity: 0;
+  }
+}
+
+/* 提交按钮：按压回弹 */
+@keyframes hm-press {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 点击涟漪 */
+@keyframes hm-ripple-out {
+  from {
+    transform: scale(0.4);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* 评测中的旋转指示器 */
+@keyframes hm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 内容页换页时的轻量入场（路由切换会重建 .vp-doc 节点，动画随之重放） */
+@keyframes hm-doc-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.hm-status,
+.VPHome .VPHero .main .heading,
+.VPHome .VPHero .main .tagline,
+.VPHome .VPHero .actions,
+.hm-paths,
+.hm-judge {
+  animation: hm-rise 0.66s var(--hm-ease) both;
+}
+
+.VPHome .VPHero .main .heading {
+  animation-delay: 0.06s;
+}
+
+.VPHome .VPHero .main .tagline {
+  animation-delay: 0.12s;
+}
+
+.VPHome .VPHero .actions {
+  animation-delay: 0.18s;
+}
+
+.hm-paths {
+  animation-delay: 0.24s;
+}
+
+.hm-judge {
+  animation-delay: 0.12s;
+}

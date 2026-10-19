@@ -1,0 +1,19 @@
+# https://editorconfig.org
+# 统一各编辑器的基础约定；与 .gitattributes 的换行策略配合使用。
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+# Markdown 行尾双空格是换行语法，不能裁剪
+trim_trailing_whitespace = false
+
+[*.{png,jpg,jpeg,webp,ico,gif}]
+# 二进制资源不做文本处理
+insert_final_newline = false

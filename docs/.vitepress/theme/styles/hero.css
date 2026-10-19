@@ -1,0 +1,233 @@
+/**
+ * 主题样式模块：Hero 外壳（纸张 + 点阵）与文案区（§3–§4）
+ * 由 theme/style.css 拆分而来 —— 顺序由入口文件的 @import 保证，勿单独调整顺序。
+ */
+
+/* ============================================================
+   §3 Hero 外壳：浅色纸张 + 点阵网格
+   ============================================================ */
+.VPHome .VPHero.VPHomeHero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: calc(var(--vp-nav-height) * -1);
+  padding: calc(var(--vp-nav-height) + 84px) var(--hm-gutter) 92px;
+  background-color: var(--vp-c-bg);
+  /* 两团极浅的色雾（绿 + 蓝），只存在于首屏顶部两角 */
+  background-image:
+    radial-gradient(880px 460px at 92% -8%, var(--hm-wash-1), transparent 64%),
+    radial-gradient(960px 500px at 4% 0%, var(--hm-wash-2), transparent 62%);
+}
+
+/* 点阵网格：技术图纸质感，向上下两侧自然淡出 */
+.VPHome .VPHero.VPHomeHero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--hm-dot) 1px, transparent 1.4px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(118% 86% at 50% 0%, #000 2%, transparent 72%);
+  mask-image: radial-gradient(118% 86% at 50% 0%, #000 2%, transparent 72%);
+}
+
+.VPHome .VPHero.VPHomeHero .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   §4 Hero 文案区
+   ============================================================ */
+
+/* —— 状态胶囊 —— */
+.hm-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  margin: 0 0 22px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  font-family: var(--hm-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--hm-ink-2);
+  background: var(--hm-tint);
+  border: 1px solid var(--hm-line);
+}
+
+.hm-status__dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--hm-green);
+  box-shadow: 0 0 0 3px var(--hm-green-soft);
+}
+
+.hm-status__dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--hm-green);
+  opacity: 0.5;
+  animation: hm-ping 2.6s var(--hm-ease-soft) infinite;
+}
+
+.hm-status__id {
+  font-weight: 700;
+  color: var(--hm-ink);
+}
+
+.hm-status__sep {
+  color: var(--hm-ink-3);
+}
+
+/* —— 标题组 —— */
+.VPHome .VPHero .main .heading {
+  display: flex;
+  flex-direction: column;
+}
+
+.VPHome .VPHero .main .name,
+.VPHome .VPHero .main .name.clip {
+  max-width: none;
+  font-size: clamp(3.1rem, 7.4vw, 5.3rem);
+  line-height: 1.04;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--hm-ink);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+/* 标题末尾的光标：这个站点「随时在等待下一次提交」 */
+.hm-caret {
+  display: inline-block;
+  width: 0.1em;
+  height: 0.74em;
+  margin-left: 0.08em;
+  border-radius: 2px;
+  background: var(--hm-green);
+  animation: hm-blink 1.15s step-end infinite;
+}
+
+.hm-caret--panel {
+  width: 0.58em;
+  height: 1em;
+  margin-left: 0.45em;
+  vertical-align: -0.14em;
+  background: var(--hm-panel-green);
+}
+
+.VPHome .VPHero .main .text {
+  max-width: none;
+  margin-top: 16px;
+  font-size: clamp(1.04rem, 1.8vw, 1.34rem);
+  line-height: 1.55;
+  font-weight: 600;
+  letter-spacing: 0.002em;
+  color: var(--hm-ink);
+}
+
+.VPHome .VPHero .main .tagline {
+  max-width: 44ch;
+  padding-top: 16px;
+  font-size: clamp(0.94rem, 1.2vw, 1.04rem);
+  line-height: 1.9;
+  font-weight: 400;
+  color: var(--hm-ink-2);
+}
+
+/* —— 按钮 —— */
+.VPHome .VPHero .actions {
+  padding-top: 30px;
+  gap: 4px;
+}
+
+.VPHome .VPHero .actions .VPButton {
+  height: 48px;
+  /* 必须与 height 同步：VitePress 默认 .VPButton.medium 是 line-height: 38px 撑高度，
+     这里改用固定 height，若不同步行高，文字会贴顶（实测偏上约 4.5px）。
+     48 = 46 内容高 + 上下各 1px 边框。 */
+  line-height: 46px;
+  padding: 0 26px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: transform 0.32s var(--hm-ease), box-shadow 0.32s var(--hm-ease),
+    background-color 0.26s ease, border-color 0.26s ease, color 0.26s ease;
+}
+
+.VPHome .VPHero .actions .VPButton.brand {
+  background: var(--hm-btn-bg);
+  border-color: transparent;
+  color: var(--hm-btn-fg);
+  box-shadow: 0 16px 34px -18px var(--hm-btn-shadow);
+}
+
+.VPHome .VPHero .actions .VPButton.brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px -20px var(--hm-btn-shadow);
+}
+
+.VPHome .VPHero .actions .VPButton.alt {
+  background: transparent;
+  border: 1px solid var(--hm-line-strong);
+  color: var(--hm-ink);
+}
+
+.VPHome .VPHero .actions .VPButton.alt:hover {
+  transform: translateY(-2px);
+  background: var(--hm-tint);
+  border-color: var(--hm-ink);
+}
+
+/* —— 快捷路径（终端风格） —— */
+.hm-paths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 26px 0 0;
+}
+
+.hm-paths__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.hm-paths__path {
+  font-family: var(--hm-mono);
+  font-size: 0.8rem;
+  color: var(--hm-ink-2);
+  transition: color 0.22s ease;
+}
+
+.hm-paths__label {
+  font-size: 0.8rem;
+  color: var(--hm-ink-3);
+  transition: color 0.22s ease;
+}
+
+.hm-paths__item:hover .hm-paths__path {
+  color: var(--hm-green);
+}
+
+.hm-paths__item:hover .hm-paths__label {
+  color: var(--hm-ink-2);
+}
+
+.VPHome .VPHero.has-image .hm-paths {
+  justify-content: center;
+}
+
+@media (min-width: 960px) {
+  .VPHome .VPHero.has-image .hm-paths {
+    justify-content: flex-start;
+  }
+}

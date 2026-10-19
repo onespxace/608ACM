@@ -1,0 +1,176 @@
+/**
+ * 主题样式模块：设计令牌 + VitePress 变量桥接（§1–§2）
+ * 由 theme/style.css 拆分而来 —— 顺序由入口文件的 @import 保证，勿单独调整顺序。
+ */
+
+/**
+ * 608ACM 主题样式 v3 ——「判题机」
+ * ==================================================================
+ * 设计概念：整页借用 OJ / 赛场的视觉语言 —— 纸张底 + 墨色排版 + Accepted 绿，
+ * 右侧一张「现场榜单」记分牌（浅色纸面卡片）作为视觉锚点。
+ *
+ * 阅读地图：
+ *   §1  设计令牌      —— 所有颜色/间距的唯一出处
+ *   §2  VitePress 变量桥接
+ *   §3  Hero 外壳     —— 浅色纸张 + 点阵网格
+ *   §4  Hero 文案区   —— 状态胶囊 / 标题 / 按钮 / 快捷路径
+ *   §5  判题机面板  —— 深色编辑器 + 终端（HomeJudge，代码逐字打出 → 提交 → AC）
+ *   §6  分区骨架与标题
+ *   §7  快速链接
+ *   §8  （已移除：原板块地图 bento）
+ *   §9  （已移除：原进阶阶梯）
+ *   §10 终端式 CTA
+ *   §11 内容页（阅读进度条 / 排版 / 自定义块 / 侧边栏…）
+ *   §12 动效 / §13 响应式 / §14 降级 / §15 收尾
+ *
+ * 两条硬约束（从上一版继承的教训）：
+ *   1. 不做 scroll-driven reveal：view() 时间线在整页截图/未滚动场景会让内容
+ *      停在 opacity:0。所有动效只发生在首屏入场与悬停，且必须可降级。
+ *   2. Hero 背景色 = 页面底色（--vp-c-bg），浅色模式下两者相同，
+ *      不存在上一版暗色 Hero 与浅色正文之间的 1px 接缝问题。
+ */
+
+/* ============================================================
+   §1 设计令牌
+   ============================================================ */
+:root {
+  /* 语义色：Accepted 绿 = 品牌签名色 */
+  --hm-green: #0a854a;
+  --hm-green-soft: rgba(10, 133, 74, 0.12);
+
+  /* 墨色体系（跟随明暗模式） */
+  --hm-ink: #0b1220;
+  --hm-ink-2: #566072;
+  --hm-ink-3: rgba(15, 23, 42, 0.5);
+  --hm-line: rgba(15, 23, 42, 0.1);
+  --hm-line-strong: rgba(15, 23, 42, 0.24);
+  --hm-tint: rgba(15, 23, 42, 0.028);
+  --hm-tint-hover: rgba(15, 23, 42, 0.05);
+  --hm-chip-bg: rgba(255, 255, 255, 0.92);
+  --hm-dot: rgba(15, 23, 42, 0.12);
+  --hm-wash-1: rgba(10, 143, 79, 0.09);
+  --hm-wash-2: rgba(37, 99, 235, 0.075);
+  --hm-glow-a: rgba(10, 143, 79, 0.2);
+  --hm-glow-b: rgba(37, 99, 235, 0.16);
+  --hm-btn-bg: #0b1220;
+  --hm-btn-fg: #ffffff;
+  --hm-btn-shadow: rgba(11, 18, 32, 0.5);
+
+  /* 内容页：行内代码与自定义块（tip / warning / …） */
+  --hm-accent-2: #0d9488;
+  --hm-grad-link: linear-gradient(90deg, #0a854a, #0d9488);
+  --hm-code-ink: #0a6e40;
+  --hm-code-bg: rgba(10, 133, 74, 0.08);
+  --hm-cb-tip: #0a854a;
+  --hm-cb-tip-bg: rgba(10, 133, 74, 0.07);
+  --hm-cb-tip-line: rgba(10, 133, 74, 0.3);
+  --hm-cb-warn: #b45309;
+  --hm-cb-warn-bg: rgba(245, 158, 11, 0.1);
+  --hm-cb-warn-line: rgba(217, 119, 6, 0.38);
+  --hm-cb-info: #1d4ed8;
+  --hm-cb-info-bg: rgba(37, 99, 235, 0.06);
+  --hm-cb-info-line: rgba(37, 99, 235, 0.3);
+  --hm-cb-danger: #b91c1c;
+  --hm-cb-danger-bg: rgba(220, 38, 38, 0.06);
+  --hm-cb-danger-line: rgba(220, 38, 38, 0.32);
+
+  /* 判题机面板（HomeJudge）：深色编辑器 + 终端，两种模式共用；
+     代码配色取 VS Code Dark+ 一脉（蓝关键字 / 黄函数 / 浅绿数字，无紫）；
+     鼠标交互色见文件末尾 §16 */
+  --hm-panel-bg: #1e1e1e;
+  --hm-panel-bar: #252526;
+  --hm-panel-status: #1a1a1a;
+  --hm-panel-line: rgba(255, 255, 255, 0.09);
+  --hm-panel-shadow: 0 36px 70px -36px rgba(3, 8, 20, 0.55), 0 2px 10px rgba(3, 8, 20, 0.14);
+  --hm-panel-ink: #d4d4d4;
+  --hm-panel-ink-2: #8b8b8b;
+  --hm-code-pre: #569cd6;
+  --hm-code-kw: #569cd6;
+  --hm-code-fn: #dcdcaa;
+  --hm-code-str: #ce9178;
+  --hm-code-num: #b5cea8;
+  --hm-code-op: #d4d4d4;
+  /* 注意：这里曾误定义 --hm-code-ink（与内容页行内代码同名互相覆盖，
+     导致浅色模式行内代码发白）。面板基础文字统一用 --hm-panel-ink。 */
+  --hm-cursor-line: rgba(10, 133, 74, 0.7);
+  --hm-spot: rgba(10, 133, 74, 0.13);
+  --hm-panel-green: #3ddc84; /* 结尾 CTA 终端与 hero 光标共用 */
+
+  /* 排版、尺寸与缓动 */
+  --hm-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+  --hm-radius: 16px;
+  --hm-radius-lg: 20px;
+  --hm-gutter: 24px;
+  --hm-max: 1152px;
+  --hm-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --hm-ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark {
+  --hm-green: #3ddc84;
+  --hm-green-soft: rgba(61, 220, 132, 0.14);
+
+  --hm-ink: #eef3fa;
+  --hm-ink-2: #9aa6ba;
+  --hm-ink-3: rgba(255, 255, 255, 0.5);
+  --hm-line: rgba(255, 255, 255, 0.1);
+  --hm-line-strong: rgba(255, 255, 255, 0.26);
+  --hm-tint: rgba(255, 255, 255, 0.035);
+  --hm-tint-hover: rgba(255, 255, 255, 0.06);
+  --hm-chip-bg: rgba(255, 255, 255, 0.05);
+  --hm-dot: rgba(255, 255, 255, 0.09);
+  --hm-wash-1: rgba(16, 185, 105, 0.12);
+  --hm-wash-2: rgba(59, 130, 246, 0.12);
+  --hm-glow-a: rgba(16, 185, 105, 0.22);
+  --hm-glow-b: rgba(59, 130, 246, 0.2);
+  --hm-btn-bg: #f2f6ff;
+  --hm-btn-fg: #0b1220;
+  --hm-btn-shadow: rgba(0, 0, 0, 0.8);
+
+  --hm-code-ink: #7ee2a8;
+  --hm-code-bg: rgba(61, 220, 132, 0.12);
+  --hm-accent-2: #2dd4bf;
+  --hm-grad-link: linear-gradient(90deg, #3ddc84, #2dd4bf);
+  --hm-cb-tip: #4ade80;
+  --hm-cb-tip-bg: rgba(61, 220, 132, 0.09);
+  --hm-cb-tip-line: rgba(61, 220, 132, 0.32);
+  --hm-cb-warn: #fbbf24;
+  --hm-cb-warn-bg: rgba(251, 191, 36, 0.1);
+  --hm-cb-warn-line: rgba(251, 191, 36, 0.34);
+  --hm-cb-info: #93c5fd;
+  --hm-cb-info-bg: rgba(96, 165, 250, 0.1);
+  --hm-cb-info-line: rgba(96, 165, 250, 0.32);
+  --hm-cb-danger: #fca5a5;
+  --hm-cb-danger-bg: rgba(248, 113, 113, 0.1);
+  --hm-cb-danger-line: rgba(248, 113, 113, 0.32);
+  /* 鼠标交互色（暗色下提亮） */
+  --hm-cursor-line: rgba(61, 220, 132, 0.75);
+  --hm-spot: rgba(61, 220, 132, 0.12);
+}
+
+/* ============================================================
+   §2 VitePress 变量桥接
+   —— 品牌色统一为「Accepted 绿」：侧边栏激活态、右侧目录滑块、
+      翻页器悬停、链接等全部由 VitePress 自身的 var() 驱动，
+      改这里即可全站生效，避免与 scoped 样式做权重缠斗。
+      深色模式的 brand-3（按钮底色 + 白字）选了 #0d7a43：对比度 5.42:1。
+   ============================================================ */
+:root {
+  --vp-c-brand-1: #0a854a;
+  --vp-c-brand-2: #087040;
+  --vp-c-brand-3: #065f37;
+  --vp-c-brand-soft: rgba(10, 133, 74, 0.12);
+
+  /* Hero 标题走墨色，不再用渐变色字 */
+  --vp-home-hero-name-color: #0b1220;
+  --vp-home-hero-name-background: none;
+}
+
+.dark {
+  --vp-c-brand-1: #3ddc84;
+  --vp-c-brand-2: #6ee7a8;
+  --vp-c-brand-3: #0d7a43;
+  --vp-c-brand-soft: rgba(61, 220, 132, 0.16);
+  --vp-home-hero-name-color: #eef3fa;
+}

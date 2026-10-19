@@ -6,6 +6,39 @@ import { defineConfig } from 'vitepress'
  */
 const base = '/608ACM/'
 
+/**
+ * 栏目定义 —— 单一数据源。
+ * 导航下拉与三处侧边栏共用这一份；调整条目或顺序时只需改这里一处
+ * （此前同样内容写了 4 份，改顺序要同步 4 处，容易漏改）。
+ */
+const navGroups = [
+  {
+    text: '入门指北',
+    items: [
+      { text: '算法竞赛入门指北', link: '/guide/' },
+      { text: '萌新认识与入门算法竞赛', link: '/guide/xcpc-beginner-guide' },
+      { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
+      { text: '提问的智慧', link: '/guide/smart-questions' },
+      { text: '计算机入门', link: '/guide/computer-intro' }
+    ]
+  },
+  {
+    text: '算法组',
+    items: [
+      { text: '简介', link: '/studio/' },
+      { text: '加入我们', link: '/studio/join-us' }
+    ]
+  },
+  {
+    text: '下半年比赛说明',
+    items: [
+      { text: 'ICPC', link: '/contests/icpc' },
+      { text: 'CCPC', link: '/contests/ccpc' },
+      { text: '牛客多校', link: '/contests/nowcoder' }
+    ]
+  }
+]
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   base,
@@ -71,116 +104,16 @@ export default defineConfig({
     // 导航用裁掉文字标的紧凑图标；1024px 内的小尺寸下完整锁定版会糊成一团
     logo: '/icpc-mark.png',
 
-    nav: [
-      {
-        text: '入门指北',
-        items: [
-          { text: '算法竞赛入门指北', link: '/guide/' },
-          { text: '萌新认识与入门算法竞赛', link: '/guide/xcpc-beginner-guide' },
-          { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
-          { text: '提问的智慧', link: '/guide/smart-questions' },
-          { text: '计算机入门', link: '/guide/computer-intro' }
-        ]
-      },
-      {
-        text: '算法组',
-        items: [
-          { text: '简介', link: '/studio/' },
-          { text: '加入我们', link: '/studio/join-us' }
-        ]
-      },
-      {
-        text: '下半年比赛',
-        items: [
-          { text: 'ICPC', link: '/contests/icpc' },
-          { text: 'CCPC', link: '/contests/ccpc' },
-          { text: '牛客多校', link: '/contests/nowcoder' }
-        ]
-      }
-    ],
+    nav: navGroups,
 
+    /**
+     * 三个分区共用同一份栏目定义（任何页面下都能看到完整站点地图）。
+     * 直接引用 navGroups 同一数组，避免三份拷贝各自漂移。
+     */
     sidebar: {
-      '/guide/': [
-        {
-          text: '入门指北',
-          items: [
-            { text: '算法竞赛入门指北', link: '/guide/' },
-            { text: '萌新认识与入门算法竞赛', link: '/guide/xcpc-beginner-guide' },
-            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
-            { text: '提问的智慧', link: '/guide/smart-questions' },
-            { text: '计算机入门', link: '/guide/computer-intro' }
-          ]
-        },
-        {
-          text: '算法组',
-          items: [
-            { text: '简介', link: '/studio/' },
-            { text: '加入我们', link: '/studio/join-us' }
-          ]
-        },
-        {
-          text: '下半年比赛说明',
-          items: [
-            { text: 'ICPC', link: '/contests/icpc' },
-            { text: 'CCPC', link: '/contests/ccpc' },
-            { text: '牛客多校', link: '/contests/nowcoder' }
-          ]
-        }
-      ],
-      '/contests/': [
-        {
-          text: '入门指北',
-          items: [
-            { text: '算法竞赛入门指北', link: '/guide/' },
-            { text: '萌新认识与入门算法竞赛', link: '/guide/xcpc-beginner-guide' },
-            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
-            { text: '提问的智慧', link: '/guide/smart-questions' },
-            { text: '计算机入门', link: '/guide/computer-intro' }
-          ]
-        },
-        {
-          text: '算法组',
-          items: [
-            { text: '简介', link: '/studio/' },
-            { text: '加入我们', link: '/studio/join-us' }
-          ]
-        },
-        {
-          text: '下半年比赛说明',
-          items: [
-            { text: 'ICPC', link: '/contests/icpc' },
-            { text: 'CCPC', link: '/contests/ccpc' },
-            { text: '牛客多校', link: '/contests/nowcoder' }
-          ]
-        }
-      ],
-      '/studio/': [
-        {
-          text: '入门指北',
-          items: [
-            { text: '算法竞赛入门指北', link: '/guide/' },
-            { text: '萌新认识与入门算法竞赛', link: '/guide/xcpc-beginner-guide' },
-            { text: '算竞前中期指南 & 训练建议', link: '/guide/satsky-guide' },
-            { text: '提问的智慧', link: '/guide/smart-questions' },
-            { text: '计算机入门', link: '/guide/computer-intro' }
-          ]
-        },
-        {
-          text: '算法组',
-          items: [
-            { text: '简介', link: '/studio/' },
-            { text: '加入我们', link: '/studio/join-us' }
-          ]
-        },
-        {
-          text: '下半年比赛说明',
-          items: [
-            { text: 'ICPC', link: '/contests/icpc' },
-            { text: 'CCPC', link: '/contests/ccpc' },
-            { text: '牛客多校', link: '/contests/nowcoder' }
-          ]
-        }
-      ]
+      '/guide/': navGroups,
+      '/contests/': navGroups,
+      '/studio/': navGroups
     },
 
     socialLinks: [

@@ -1,0 +1,113 @@
+/**
+ * 主题样式模块：全局鼠标交互（§16）
+ * 由 theme/style.css 拆分而来 —— 顺序由入口文件的 @import 保证，勿单独调整顺序。
+ */
+
+/* ============================================================
+   §16 全局鼠标交互（2026-10-07）
+   —— 点击涟漪 / 卡片聚光灯 / 导航下划线 / 按钮按压。
+      仅对精确指针设备启用（Layout.vue 判定 hover + pointer:fine），
+      并尊重 prefers-reduced-motion（见本节末尾覆盖）。
+   ============================================================ */
+
+/* 点击涟漪（JS 在指针位置生成，动画结束自动移除） */
+.hm-fx-ripple {
+  position: fixed;
+  z-index: 9998;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid var(--hm-cursor-line);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: hm-fx-ripple 0.62s var(--hm-ease-soft) forwards;
+}
+
+@keyframes hm-fx-ripple {
+  from {
+    transform: scale(0.45);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* 卡片聚光灯：--mx/--my 由 JS 写入，悬停时点亮 */
+.hm-spot {
+  position: relative;
+}
+
+.hm-spot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), var(--hm-spot), transparent 68%);
+}
+
+.hm-spot:hover::after {
+  opacity: 1;
+}
+
+/* 导航栏：悬停 / 激活时文字下方展开一条签名绿短线
+   （本站导航为下拉组 VPNavBarMenuGroup；VPNavBarMenuLink 兼容直链场景） */
+.VPNavBarMenuLink > span:not([class]),
+.VPNavBarMenuGroup .text > span:not([class]) {
+  position: relative;
+}
+
+.VPNavBarMenuLink > span:not([class])::after,
+.VPNavBarMenuGroup .text > span:not([class])::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  /* 注意：这里不能用 bottom —— 文字 span 被拉伸到整条导航的高度
+     （display:block + line-height = 导航高），bottom 会把线甩到导航栏外；
+     文字垂直居中时用「50% + 常量」正好贴在文字下方（任何导航高都成立）。 */
+  top: calc(50% + 11px);
+  height: 2px;
+  border-radius: 99px;
+  background: var(--hm-green);
+  transition: left 0.28s var(--hm-ease), right 0.28s var(--hm-ease);
+}
+
+.VPNavBarMenuLink:hover > span:not([class])::after,
+.VPNavBarMenuLink.active > span:not([class])::after,
+.VPNavBarMenuGroup:hover .text > span:not([class])::after,
+.VPNavBarMenuGroup.active .text > span:not([class])::after {
+  left: 0;
+  right: 0;
+}
+
+/* 按钮按压反馈（触感） */
+.VPHome .VPHero .actions .VPButton:active,
+.hm-btn:active {
+  scale: 0.97;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-fx-ripple {
+    display: none;
+  }
+
+  .hm-spot::after {
+    display: none;
+  }
+
+  .VPNavBarMenuLink > span:not([class])::after,
+  .VPNavBarMenuGroup .text > span:not([class])::after {
+    display: none;
+  }
+
+  .VPHome .VPHero .actions .VPButton:active,
+  .hm-btn:active {
+    scale: 1;
+  }
+}

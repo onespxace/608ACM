@@ -1,0 +1,332 @@
+/**
+ * 主题样式模块：分区骨架 / 快速链接 / 终端式 CTA（§6、§7、§10）
+ * 由 theme/style.css 拆分而来 —— 顺序由入口文件的 @import 保证，勿单独调整顺序。
+ */
+
+/* ============================================================
+   §6 分区骨架与标题组
+   ============================================================ */
+.hm-section {
+  max-width: var(--hm-max);
+  margin: 0 auto;
+  padding: 0 var(--hm-gutter);
+}
+
+.hm-section + .hm-section {
+  padding-top: 92px;
+}
+
+.hm-head {
+  max-width: 760px;
+  margin-bottom: 36px;
+}
+
+.hm-head__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-family: var(--hm-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--hm-green);
+}
+
+.hm-head__eyebrow::before {
+  content: '';
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hm-green);
+  opacity: 0.85;
+}
+
+.hm-head__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.9vw, 2.05rem);
+  font-weight: 750;
+  line-height: 1.3;
+  letter-spacing: -0.022em;
+  color: var(--hm-ink);
+}
+
+/* 中文标题避免「孤字行」；不支持的浏览器直接忽略 */
+.hm-head__title,
+.hm-cta__title {
+  text-wrap: pretty;
+}
+
+.hm-head__sub {
+  margin: 13px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.85;
+  color: var(--hm-ink-2);
+}
+
+/* ============================================================
+   §7 快速链接
+   —— 参考山东理工 ACM 官网与 xcpc.link（AWESOME XCPC）的资源导航体例：
+      四组（题库评测 / 学习资料 / 实用工具 / 榜单赛事），名 + 一句话说明；
+      桌面四列、平板 2×2；移动端（≤640px，见 §13）改为组内双列图标芯片
+   ============================================================ */
+.hm-links {
+  padding-top: 6px;
+}
+
+.hm-links__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 40px 36px;
+}
+
+.hm-links__tag {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 8px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--hm-line);
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--hm-ink);
+}
+
+.hm-links__no {
+  font-family: var(--hm-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--hm-green);
+}
+
+.hm-links__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hm-links__list li + li {
+  border-top: 1px solid var(--hm-line);
+}
+
+.hm-links__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 2px;
+  text-decoration: none;
+}
+
+/* 站点图标：本地 favicon 放在浅色小方片里 */
+.hm-links__logo {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin-top: 1px;
+  border-radius: 8px;
+  background: var(--hm-chip-bg);
+  border: 1px solid var(--hm-line);
+  overflow: hidden;
+}
+
+.hm-links__logo img {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+}
+
+.hm-links__body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.hm-links__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.94rem;
+  font-weight: 650;
+  color: var(--hm-ink);
+  transition: color 0.22s ease;
+}
+
+.hm-links__name svg {
+  width: 13px;
+  height: 13px;
+  color: var(--hm-ink-3);
+  transition: transform 0.28s var(--hm-ease), color 0.22s ease;
+}
+
+.hm-links__desc {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--hm-ink-2);
+}
+
+.hm-links__item:hover .hm-links__name {
+  color: var(--hm-green);
+}
+
+.hm-links__item:hover .hm-links__name svg {
+  color: var(--hm-green);
+  transform: translate(2px, -2px);
+}
+
+/* （原 §8 板块地图 bento 样式已随八个入口一并移除） */
+
+/* （原 §9 进阶阶梯样式已随四级阶梯一并移除） */
+
+/* ============================================================
+   §10 终端式 CTA
+   ============================================================ */
+.hm-cta {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--hm-radius-lg);
+  background-color: #0a0e15;
+  background-image:
+    radial-gradient(720px 320px at 10% -4%, rgba(12, 158, 86, 0.32), transparent 64%),
+    radial-gradient(640px 300px at 90% 104%, rgba(37, 99, 235, 0.28), transparent 62%),
+    linear-gradient(180deg, #0c1119 0%, #070a10 100%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 46px 90px -52px rgba(2, 6, 16, 0.9);
+}
+
+.hm-cta__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hm-cta__shell,
+.hm-cta__term {
+  font-family: var(--hm-mono);
+  font-size: 0.73rem;
+  color: rgba(190, 205, 228, 0.55);
+}
+
+.hm-cta__term {
+  margin-left: auto;
+  opacity: 0.7;
+}
+
+.hm-cta__body {
+  padding: 42px 42px 36px;
+}
+
+.hm-cta__cmd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 24px;
+  font-family: var(--hm-mono);
+  font-size: 0.84rem;
+  color: rgba(190, 205, 228, 0.62);
+}
+
+.hm-cta__cmd > span:first-child {
+  color: var(--hm-panel-green);
+  font-weight: 700;
+}
+
+.hm-cta__run {
+  color: #e6edf3;
+}
+
+.hm-cta__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 3.1vw, 2.3rem);
+  font-weight: 780;
+  line-height: 1.28;
+  letter-spacing: -0.024em;
+  color: #f4f8ff;
+}
+
+.hm-cta__desc {
+  max-width: 52ch;
+  margin: 14px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.88;
+  color: rgba(212, 225, 244, 0.72);
+}
+
+.hm-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.hm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 12px;
+  font-size: 0.93rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.3s var(--hm-ease), background-color 0.26s ease,
+    border-color 0.26s ease, box-shadow 0.3s var(--hm-ease);
+}
+
+.hm-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.hm-btn--solid {
+  background: #f4f8ff;
+  color: #0b1220;
+  box-shadow: 0 16px 34px -18px rgba(190, 220, 255, 0.55);
+}
+
+.hm-btn--solid:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px -18px rgba(190, 220, 255, 0.7);
+}
+
+.hm-btn--ghost {
+  color: #eaf1ff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.hm-btn--ghost:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+.hm-cta__hint {
+  margin: 26px 0 0;
+  font-family: var(--hm-mono);
+  font-size: 0.74rem;
+  color: rgba(184, 200, 224, 0.46);
+}
+
+.hm-cta__hint kbd {
+  display: inline-block;
+  margin: 0 2px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  color: rgba(226, 238, 255, 0.85);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* 首页底部的呼吸留白 */
+.VPHome {
+  margin-bottom: 110px;
+}
