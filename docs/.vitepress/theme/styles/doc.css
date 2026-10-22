@@ -527,3 +527,98 @@ html:has(.VPHome) .hm-progress {
   display: inline-block;
   max-width: min(100%, 520px);
 }
+
+/* ============================================================
+   §11.9 算法组简介：荣誉陈列（studio/index）
+   ============================================================ */
+.hm-honor {
+  margin: 38px 0 8px;
+  text-align: center;
+}
+
+.hm-honor img {
+  display: inline-block;
+  width: min(100%, 560px);
+  border-radius: 16px;
+  box-shadow: 0 30px 60px -34px rgba(11, 18, 32, 0.5), 0 2px 8px rgba(11, 18, 32, 0.08);
+}
+
+.dark .hm-honor img {
+  box-shadow: 0 30px 60px -34px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.hm-honor__quote {
+  margin: 34px 0 0;
+  font-size: 1.28rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  color: var(--hm-ink);
+}
+
+.hm-honor__quote::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  margin: 0 auto 18px;
+  border-radius: 99px;
+  background: var(--hm-green);
+}
+
+/* ============================================================
+   §11.10 加入我们：纳新要求清单（studio/join-us）
+   —— 大序号（01–04）等宽字体，发丝线分隔，悬停整行淡底
+   ============================================================ */
+.hm-req ol {
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: hm-req;
+  border-top: 1px solid var(--hm-line);
+}
+
+.hm-req li {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  margin: 0;
+  padding: 18px 10px;
+  border-bottom: 1px solid var(--hm-line);
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--hm-ink);
+  counter-increment: hm-req;
+  transition: background-color 0.24s ease, padding-left 0.3s var(--hm-ease);
+}
+
+.hm-req li::before {
+  content: counter(hm-req, decimal-leading-zero);
+  flex: none;
+  width: 2.4ch;
+  font-family: var(--hm-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--hm-green);
+}
+
+.hm-req li:hover {
+  background-color: var(--hm-tint);
+  padding-left: 16px;
+}
+
+/* 紧跟 H1 的 H2 不再需要顶部分隔线（H1 自带装饰线，避免「加入我们」这类
+   短页面首屏出现悬空的横线 + 过大间距） */
+.vp-doc h1 + h2 {
+  margin-top: 26px;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* 紧跟 H1 的 H2 不再需要顶部分隔线（H1 自带装饰线，避免「加入我们」这类
+   短页面首屏出现悬空的横线 + 过大间距） */
+.vp-doc h1 + h2 {
+  margin-top: 26px;
+  padding-top: 0;
+  border-top: none;
+}

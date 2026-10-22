@@ -78,7 +78,7 @@
   gap: 7px;
   padding: 5px 10px;
   border-radius: 7px;
-  background: rgba(86, 156, 214, 0.16);
+  background: rgba(77, 147, 117, 0.18);
   font-family: var(--hm-mono);
   font-size: 0.74rem;
   color: var(--hm-panel-ink);
@@ -171,7 +171,7 @@
   width: 2.2ch;
   margin-right: 16px;
   text-align: right;
-  color: #858585;
+  color: #5f5f58;
 }
 
 /* 打字光标：逐字打出时在行尾常亮 */
@@ -181,11 +181,11 @@
   height: 1.02em;
   margin-left: 1px;
   border-radius: 1px;
-  background: #aeafad;
+  background: #dbd7ca;
   animation: hm-blink 1.05s step-end infinite;
 }
 
-/* —— 语法着色（GitHub Dark 一脉） —— */
+/* —— 语法着色（Vitesse Dark 一脉） —— */
 .hm-editor__code .t-pre {
   color: var(--hm-code-pre);
 }
@@ -264,7 +264,7 @@
 }
 
 .hm-editor__v1 {
-  color: #e0af68;
+  color: #e6cc77;
 }
 
 .hm-editor__v2 {
@@ -286,8 +286,8 @@
   width: 11px;
   height: 11px;
   border-radius: 50%;
-  border: 2px solid rgba(224, 175, 104, 0.3);
-  border-top-color: #e0af68;
+  border: 2px solid rgba(230, 204, 119, 0.3);
+  border-top-color: #e6cc77;
   animation: hm-spin 0.7s linear infinite;
 }
 
