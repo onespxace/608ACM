@@ -622,3 +622,73 @@ html:has(.VPHome) .hm-progress {
   padding-top: 0;
   border-top: none;
 }
+
+/* ============================================================
+   §11.11 训练计划（studio/training）
+   —— 垂直时间轴：绿色节点 + 连接线，节点内为时间标签 / 标题 / 说明
+   ============================================================ */
+.hm-plan {
+  margin: 36px 0 8px;
+}
+
+.hm-plan__item {
+  position: relative;
+  margin: 0 0 34px;
+  padding-left: 32px;
+}
+
+/* 节点圆点 */
+.hm-plan__item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--hm-green);
+  box-shadow: 0 0 0 4px var(--hm-green-soft);
+}
+
+/* 连接线：贯穿到下一个节点 */
+.hm-plan__item::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 20px;
+  bottom: -34px;
+  width: 1px;
+  background: var(--hm-line);
+}
+
+.hm-plan__item:last-child {
+  margin-bottom: 0;
+}
+
+.hm-plan__item:last-child::after {
+  display: none;
+}
+
+.hm-plan__meta {
+  margin: 0 0 5px;
+  font-family: var(--hm-mono);
+  font-size: 0.73rem;
+  letter-spacing: 0.08em;
+  color: var(--hm-green);
+}
+
+.hm-plan__title {
+  margin: 0 0 7px;
+  font-size: 1.06rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+  color: var(--hm-ink);
+}
+
+.hm-plan__desc {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.85;
+  color: var(--hm-ink-2);
+}

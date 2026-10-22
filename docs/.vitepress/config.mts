@@ -26,6 +26,7 @@ const navGroups = [
     text: '算法组',
     items: [
       { text: '简介', link: '/studio/' },
+      { text: '训练计划', link: '/studio/training' },
       { text: '加入我们', link: '/studio/join-us' }
     ]
   },
