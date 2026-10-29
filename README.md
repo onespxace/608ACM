@@ -8,7 +8,15 @@
 
 - [VitePress](https://vitepress.dev/) — 基于 Vite 的静态站点生成器
 - TypeScript
-- 部署于 Cloudflare Workers / GitHub Pages
+- 部署于 GitHub Pages，线上地址 <https://acm.anter.top>
+
+> **关于 base**：站点跑在自定义域名的根目录，`config.mts` 里 `base` 为 `/`。
+> 历史原因曾部署在 `https://onespxace.github.io/608ACM/` 子路径下（base 为 `/608ACM/`），
+> 那时所有资源路径都带该前缀；换自定义域名后若仍保留前缀，浏览器会去请求
+> `https://acm.anter.top/608ACM/assets/…` 而全部 404，表现为整站样式丢失、只剩纯文本。
+> 需要回到子路径部署时用环境变量覆盖，不必改代码：`VITEPRESS_BASE=/608ACM/ npm run docs:build`。
+> 另外 `theme/styles/doc.css` 里 6 处资源清单图标是写死的根路径 `url('/…')`，
+> VitePress 不会改写 CSS 中的 `url()`，改 base 时需同步（文件内有注释标注）。
 
 ## 本地开发
 

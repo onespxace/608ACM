@@ -1,10 +1,17 @@
 import { defineConfig } from 'vitepress'
 
 /**
- * 站点部署在子路径下（GitHub Pages / Cloudflare Worker 均按此前缀路由）。
+ * 站点部署在域名根目录（自定义域名 acm.anter.top 直接指向 Pages 站点根）。
+ *
+ * 历史：此前托管在 GitHub Pages 子路径下，base 为 '/608ACM/'。换自定义域名后
+ * 站点在根目录，若仍写 '/608ACM/'，浏览器会去请求 https://<域名>/608ACM/assets/…
+ * 而该路径不存在 —— 表现为整站样式与脚本 404、页面只剩纯文本。
+ *
  * 注意：VitePress 不会给 head 里的 href 自动加 base，所以这里手动拼接。
+ * 若将来需要回到子路径部署，用环境变量覆盖即可，不必改代码：
+ *   VITEPRESS_BASE=/608ACM/ npm run docs:build
  */
-const base = '/608ACM/'
+const base = process.env.VITEPRESS_BASE || '/'
 
 /**
  * 栏目定义 —— 单一数据源。

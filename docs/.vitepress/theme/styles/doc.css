@@ -410,7 +410,9 @@ html:has(.VPHome) .hm-progress {
 /* —— 11.8 资源清单（guide/computer-intro） ——
    图标 + 名称 + 行尾箭头的链接行：发丝线分隔，悬停整行淡底、名称转绿、箭头右移。
    图标按目标地址用 ::before 匹配（装饰性内容，不进读屏），markdown 侧保持纯列表。
-   注意：图标路径含站点 base（/608ACM/），修改 config.mts 的 base 时需同步这里。 */
+   注意：图标路径是根域名绝对路径（base 为 '/'，站点跑在自定义域名根目录）。
+   若将来改回子路径部署，这 6 处 url() 需同步加上 base 前缀 —— VitePress
+   不会改写 CSS 中 url() 的资源路径。 */
 .hm-entry ul {
   list-style: none;
   margin: 30px 0 8px;
@@ -450,28 +452,28 @@ html:has(.VPHome) .hm-progress {
 }
 
 .hm-entry li > a[href*="/guide/smart-questions"]::before {
-  background-image: url('/608ACM/icpc-mark.png');
+  background-image: url('/icpc-mark.png');
   background-size: 20px 20px;
 }
 
 .hm-entry li > a[href*="blog.wfso.cn"]::before {
-  background-image: url('/608ACM/icons/entry-wfso.svg');
+  background-image: url('/icons/entry-wfso.svg');
 }
 
 .hm-entry li > a[href*="criwits.top"]::before {
-  background-image: url('/608ACM/icons/entry-criwits.svg');
+  background-image: url('/icons/entry-criwits.svg');
 }
 
 .hm-entry li > a[href*="csdiy.wiki"]::before {
-  background-image: url('/608ACM/icons/entry-csdiy.svg');
+  background-image: url('/icons/entry-csdiy.svg');
 }
 
 .hm-entry li > a[href*="notes.linho.cc"]::before {
-  background-image: url('/608ACM/icons/entry-linho.png');
+  background-image: url('/icons/entry-linho.png');
 }
 
 .hm-entry li > a[href*="elysium-stack.cn"]::before {
-  background-image: url('/608ACM/icons/entry-elysium.ico');
+  background-image: url('/icons/entry-elysium.ico');
 }
 
 /* 行尾箭头：矢量遮罩（不产生可朗读文本，颜色随 currentColor） */
